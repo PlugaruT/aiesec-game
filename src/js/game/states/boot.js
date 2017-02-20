@@ -2,6 +2,10 @@ var Stats = require('Stats')
   , properties = require('../properties')
   , boot = {};
 
+boot.preload = function() {
+    // this.game.load.image('star', 'images/star.png');
+};
+
 boot.create = function () {
 
   if (properties.showStats) {
