@@ -4,7 +4,7 @@ var _ = require('lodash')
     { boot: require('./states/boot.js')
     , preloader: require('./states/preloader.js')
     , game: require('./states/game.js')
-    // , flappy: require('./states/flappy.js')
+    , flappy: require('./states/flappy.js')
     }
   , game = new Phaser.Game(properties.size.x, properties.size.y, Phaser.AUTO, 'game');
 
