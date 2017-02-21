@@ -5,7 +5,7 @@ var _ = require('lodash')
     , preloader: require('./states/preloader.js')
     , game: require('./states/game.js')
     }
-  , game = new Phaser.Game(properties.size.x, properties.size.y, Phaser.AUTO, 'game');
+  , game = new Phaser.Game(1200, 600, Phaser.CANVAS, 'game');
 
 // Automatically register each state.
 _.each(states, function(state, key) {
