@@ -1,11 +1,13 @@
 var game = {};
 var score = 0;
 var scoreText;
+var _ = require('lodash');
+
 // var platforms;
 // var cursors;
 
 game.create = function () {
-    //  We're going to be using physics, so enable the Arcade Physics system
+    //  We're going to be using physics, so enable the P2 Physics system
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
     //  A simple background for our game
@@ -27,41 +29,44 @@ game.create = function () {
     ground.body.immovable = true;
 
     //  Now let's create two ledges
-    var ledge = platforms.create(400, 400, 'ground');
+    // var ledge = platforms.create(400, 400, 'ground');
 
-    ledge.body.immovable = true;
+    // ledge.body.immovable = true;
 
-    ledge = platforms.create(-150, 250, 'ground');
+    // ledge = platforms.create(-150, 250, 'ground');
 
-    ledge.body.immovable = true;
+    // ledge.body.immovable = true;
 
-    player = game.add.sprite(32, game.world.height - 150, 'dude');
-    // game.add.tween(player).to({angle: 180}, 1, Phaser.Easing.Linear.None, true);
-    // player.anchor.setTo(.5, .5);
-    // player.anchor.scale.y *= -1;
+    player = game.add.sprite(100, game.world.height / 2, 'blueMan');
+    // player.alpha = 1000;
 
     game.physics.arcade.enable(player);
+
+    player.facingRight = true;
 
     player.body.bounce.y = 0.2;
     player.body.gravity.y = 300;
     player.body.collideWorldBounds = true;
 
     //  Our two animations, walking left and right.
-    player.animations.add('left', [0, 1, 2, 3], 10, true);
-    player.animations.add('right', [5, 6, 7, 8], 10, true);
+    // player.animations.add('idle', [0], 12, false);
+    player.animations.add('jumpRight', _.range(7, 13), 10, false);
+    player.animations.add('jumpLeft', _.range(31, 13), 10, false);
+    player.animations.add('rightRun', _.range(14, 24), 24, true);
+    player.animations.add('leftRun', _.range(38, 48), 24, true);
 
     cursors = game.input.keyboard.createCursorKeys();
 
     stars = game.add.group();
     stars.enableBody = true;
 
-    for (var i = 0; i < 12; i++){
+    for (var i = 0; i < 12; i++) {
         var star = stars.create(i * 70, 0, 'star');
         star.body.gravity.y = 6;
 
         star.body.bounce.y = 0.7 + Math.random() * 0.2;
     }
-    scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+    scoreText = game.add.text(16, 16, 'score: 0', {fontSize: '32px', fill: '#000'});
 };
 
 
@@ -72,34 +77,44 @@ game.update = function () {
 
     this.game.debug.text(hitPlatform);
     //  Reset the players velocity (movement)
-    // player.body.velocity.x = 0;
+    player.body.velocity.x = 0;
 
     if (cursors.left.isDown) {
         //  Move to the left
-        player.body.velocity.x = 150;
+        player.body.velocity.x = -320;
+        // player.animations.play('leftRun');
+        player.facingRight = false;
 
-        player.animations.play('right');
     }
     else if (cursors.right.isDown) {
-    //      Move to the right
-        player.body.velocity.x = -150;
+        //      Move to the right
+        player.body.velocity.x = 320;
+        // player.animations.play('rightRun');
+        player.facingRight = true;
 
-        player.animations.play('left');
     }
     else {
         //  Stand still
-        player.animations.stop();
-
-        player.frame = 4;
+        if (player.facingRight)
+            player.animations.play('rightRun');
+        else
+            player.animations.play('leftRun');
     }
 
     //  Allow the player to jump if they are touching the ground.
     if (cursors.up.isDown && player.body.touching.down && hitPlatform) {
         player.body.velocity.y = -350;
+
+        //define direction of jump
+        if (player.facingRight)
+            player.animations.play('jumpRight');
+        else
+            player.animations.play('jumpLeft');
+
     }
 };
 
-function collectStar (player, star) {
+function collectStar(player, star) {
 
     // Removes the star from the screen
     star.kill();
