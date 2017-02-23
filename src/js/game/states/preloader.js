@@ -16,6 +16,9 @@ preloader.preload = function () {
     this.game.load.spritesheet('blueMan', 'images/blueman.png', 150, 172, 48);
     this.game.load.spritesheet('buttons', 'images/buttons.png', 1000, 1000, 9);
     this.game.load.image('mainMenu', 'images/menu.png');
+    this.game.load.image('cage', 'images/cage.png');
+    this.game.load.image('dove', 'images/dove.png');
+    this.game.load.image('chain', 'images/chain.png');
 
     this.game.load.audio('birdJump', 'audio/jump.wav');
     this.game.load.audio('beep', 'audio/beep.mp3');
