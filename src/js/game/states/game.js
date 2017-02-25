@@ -5,11 +5,11 @@ var game = {};
 game.create = function () {
   this.game.physics.startSystem(Phaser.Physics.ARCADE);
   this.game.stage.backgroundColor = '#000';
-
+  let scaleRatio = window.devicePixelRatio / 2;
+  
   this.weather = new Weather.Weather(this.game);
-
+  
   this.dayCycle = new DayNightCycle.DayNightCycle(this.game, 5000);
-
   let bgBitMap = this.game.add.bitmapData(this.game.width, this.game.height);
 
   bgBitMap.ctx.rect(0, 0, this.game.width, this.game.height);
@@ -19,6 +19,7 @@ game.create = function () {
   this.backgroundSprite = this.game.add.sprite(0, 0, bgBitMap);
 
   this.sunSprite = this.game.add.sprite(50, -250, 'sun');
+  this.sunSprite.scale.setTo(scaleRatio, scaleRatio);
   this.moonSprite = this.game.add.sprite(this.game.width - (this.game.width / 4), this.game.height + 500, 'moon');
 
 
