@@ -6,7 +6,8 @@ var player;
 var platforms;
 var cages;
 var hitCageSound;
-
+var BlueMan = require('../objects/blueMan.js');
+var Cage = require('../objects/cage.js');
 // var platforms;
 // var cursors;
 
@@ -32,26 +33,14 @@ game.create = function () {
     //  This stops it from falling away when you jump on it
     ground.body.immovable = true;
 
-    hitCageSound = game.add.audio('beep');
+    // game.physics.startSystem(Phaser.Physics.P2JS);
+    // game.physics.p2.gravity.y = 1200;
+
+    // //  Length, xAnchor, yAnchor
+    // createRope(40, 400, 64);
 
 //------------------------- PLAYER 
-    player = game.add.sprite(100, game.world.height / 2, 'blueMan');
-    // player.alpha = 1000;
-
-    game.physics.arcade.enable(player);
-
-    player.facingRight = true;
-
-    player.body.bounce.y = 0.2;
-    player.body.gravity.y = 300;
-    player.body.collideWorldBounds = true;
-
-    //  Our two animations, walking left and right.
-    // player.animations.add('idle', [0], 12, false);
-    player.animations.add('jumpRight', _.range(7, 13), 10, false);
-    player.animations.add('jumpLeft', _.range(31, 13), 10, false);
-    player.animations.add('rightRun', _.range(14, 24), 18, true);
-    player.animations.add('leftRun', _.range(38, 48), 18, true);
+    player = new BlueMan.BlueMan(game);
 //-------------------------
 
 
@@ -60,118 +49,151 @@ game.create = function () {
     cages = game.add.group();
     cages.enableBody = true;
 
-    this.timer = game.time.events.loop(3000, createCage, game);
+    this.timer = game.time.events.loop(3000, spawnCage, game);
 
     scoreText = game.add.text(16, 16, 'score: 0', {fontSize: '32px', fill: '#000'});
 };
 
 
 game.update = function () {
-    var hitPlatform = game.physics.arcade.collide(player, platforms);
-    game.physics.arcade.overlap(player, cages, freeDove, null, this);
+    var hitPlatform = game.physics.arcade.collide(player.getBody(), platforms);
+    game.physics.arcade.overlap(player.getBody(), cages, hitCage, null, this);
 
-    this.game.debug.text(hitPlatform);
-    //  Reset the players velocity (movement)
+    player.resetXvelocity();
 
-    player.body.velocity.x = 0;
-
-    if (cursors.left.isDown) {
-        //  Move to the left
-        player.body.velocity.x = -320;
-        // player.animations.play('leftRun');
-        player.facingRight = false;
-
-    }
-    else if (cursors.right.isDown) {
-        //      Move to the right
-        player.body.velocity.x = 320;
-        // player.animations.play('rightRun');
-        player.facingRight = true;
-
-    }
-    else {
-        //  Stand still
-        if (player.facingRight)
-            player.animations.play('rightRun');
-        else
-            player.animations.play('leftRun');
-    }
+    if (cursors.left.isDown) player.moveLeft();
+    else if (cursors.right.isDown) player.moveRight();
+    else player.standStill();
 
     //  Allow the player to jump if they are touching the ground.
-    if (cursors.up.isDown && player.body.touching.down && hitPlatform) {
-        player.body.velocity.y = -350;
-
-        //define direction of jump
-        if (player.facingRight)
-            player.animations.play('jumpRight');
-        else
-            player.animations.play('jumpLeft');
-
+    if (cursors.up.isDown && player.getBody().body.touching.down && hitPlatform) {
+        player.jump();
     }
 };
 
-function createCage(){
-    var chainLength = Math.floor(Math.random() * 20) + 5;
-    var i;
-    for(i = 0; i < chainLength; i++){
-        buildChain(game.world.width, i*7);
-    }
+function spawnCage(){
+    var cage = new Cage.Cage(game);
+    cages.add(cage.getBody());
+}
 
-    // Create a cage at the position x and y
-    var cage = game.add.sprite(game.world.width, i*7, 'cage');
-    cage.scale.setTo(0.4);
-    cage.anchor.setTo(0.5, 0);
+function hitCage(player, cage){
+    cage.freeDove();
+}
 
-    // Add the cage to our previously created group
-    cages.add(cage);
+// function createCage(){
+//     var chainLength = Math.floor(Math.random() * 20) + 5;
+//     var i;
+//     for(i = 0; i < chainLength; i++){
+//         buildChain(game.world.width, i*7);
+//     }
 
-    // Enable physics on the cage
-    game.physics.arcade.enable(cage);
+//     // Create a cage at the position x and y
+//     var cage = game.add.sprite(game.world.width, i*7, 'cage');
+//     cage.scale.setTo(0.4);
+//     cage.anchor.setTo(0.5, 0);
+
+//     // Add the cage to our previously created group
+//     cages.add(cage);
+
+//     // Enable physics on the cage
+//     game.physics.arcade.enable(cage);
     
 
-    // Add velocity to the cage to make it move left
-    cage.body.velocity.x = -150;
+//     // Add velocity to the cage to make it move left
+//     cage.body.velocity.x = -150;
 
-    // Automatically kill the cage when it's no longer visible
-    cage.checkWorldBounds = true;
-    cage.outOfBoundsKill = true;
-}
+//     // Automatically kill the cage when it's no longer visible
+//     cage.checkWorldBounds = true;
+//     cage.outOfBoundsKill = true;
+// }
 
-function buildChain(x, y) {
-    // Create a pipe at the position x and y
-    var chain = game.add.sprite(x, y, 'chain');
-    chain.scale.setTo(0.07);
-    chain.anchor.setTo(0.5, 0);
+// function buildChain(x, y) {
+//     // Create a pipe at the position x and y
+//     var chain = game.add.sprite(x, y, 'chain');
+//     chain.scale.setTo(0.07);
+//     chain.anchor.setTo(0.5, 0);
 
-    // Enable physics on the pipe
-    game.physics.arcade.enable(chain);
+//     // Enable physics on the pipe
+//     game.physics.arcade.enable(chain);
 
-    // Add velocity to the pipe to make it move left
-    chain.body.velocity.x = -150;
+//     // Add velocity to the pipe to make it move left
+//     chain.body.velocity.x = -150;
 
-    // Automatically kill the pipe when it's no longer visible
-    chain.checkWorldBounds = true;
-    chain.outOfBoundsKill = true;
-}
+//     // Automatically kill the pipe when it's no longer visible
+//     chain.checkWorldBounds = true;
+//     chain.outOfBoundsKill = true;
+// }
+
+// function createRope(length, xAnchor, yAnchor) {
+
+//     var lastRect;
+//     var height = 20;        //  Height for the physics body - your image height is 8px
+//     var width = 16;         //  This is the width for the physics body. If too small the rectangles will get scrambled together.
+//     var maxForce = 20000;   //  The force that holds the rectangles together.
+
+//     for (var i = 0; i <= length; i++)
+//     {
+//         var x = xAnchor;                    //  All rects are on the same x position
+//         var y = yAnchor + (i * height);     //  Every new rect is positioned below the last
+
+//         if (i % 2 === 0)
+//         {
+//             //  Add sprite (and switch frame every 2nd time)
+//             newRect = game.add.sprite(x, y, 'chain', 1);
+//         }   
+//         else
+//         {
+//             newRect = game.add.sprite(x, y, 'chain', 0);
+//             lastRect.bringToTop();
+//         }
+
+//         //  Enable physicsbody
+//         game.physics.p2.enable(newRect, false);
+
+//         //  Set custom rectangle
+//         newRect.body.setRectangle(width, height);
+
+//         if (i === 0)
+//         {
+//             newRect.body.static = true;
+//         }
+//         else
+//         {  
+//             //  Anchor the first one created
+//             newRect.body.velocity.x = 400;      //  Give it a push :) just for fun
+//             newRect.body.mass = length / i;     //  Reduce mass for evey rope element
+//         }
+
+//         //  After the first rectangle is created we can add the constraint
+//         if (lastRect)
+//         {
+//             game.physics.p2.createRevoluteConstraint(newRect, [0, -10], lastRect, [0, 10], maxForce);
+//         }
+
+//         lastRect = newRect;
+
+//     }
+
+// }
 
 
-function freeDove(player, cage) {
-    // dummy cage to show the fade-out effect (temporary solution)
-    hitCageSound.play();
-    var dummyCage = game.add.sprite(cage.x, cage.y, 'cage');
-    dummyCage.scale.setTo(0.4);
-    dummyCage.anchor.setTo(0.5, 0);
-    game.physics.arcade.enable(dummyCage);
-    dummyCage.body.velocity.x = -150;
+// function freeDove(player, cage) {
+//     // dummy cage to show the fade-out effect (temporary solution)
+//     hitCageSound.play();
+//     var dummyCage = game.add.sprite(cage.x, cage.y, 'cage');
+//     dummyCage.scale.setTo(0.4);
+//     dummyCage.anchor.setTo(0.5, 0);
+//     game.physics.arcade.enable(dummyCage);
+//     dummyCage.body.velocity.x = -150;
 
-    cage.kill();
+//     cage.kill();
 
-    // cage fade-out effect
-    game.add.tween(dummyCage).to( { alpha: 0 }, 500, "Linear", true);
+//     // cage fade-out effect
+//     game.add.tween(dummyCage).to( { alpha: 0 }, 500, "Linear", true);
     
-    //  Add and update the score
-    score += 10;
-    scoreText.text = 'Score: ' + score;
-}
+//     //  Add and update the score
+//     score += 10;
+//     scoreText.text = 'Score: ' + score;
+// }
 
 module.exports = game;
