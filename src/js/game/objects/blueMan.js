@@ -6,9 +6,9 @@ class BlueMan{
 
 
 	createBlueMan(){
+		let _ = require('lodash');
 		let player = this.game.add.sprite(100, this.game.world.height / 2, 'blueMan');
 		player.scale.setTo(0.8);
-		let _ = require('lodash');
     	this.game.physics.arcade.enable(player);
 
     	player.facingRight = true;
@@ -16,7 +16,7 @@ class BlueMan{
 	    player.body.gravity.y = 500;
 	    player.body.collideWorldBounds = true;
 
-	    player.animations.add('jumpRight', _.range(7, 13), 10, false);
+	    player.animations.add('jumpRight', _.range(7, 13), 2, false);
 	    player.animations.add('rightRun', _.range(14, 24), 18, true);
 	    player.animations.add('rightRunFast', _.range(14, 24), 22, true);
 	    player.animations.add('rightRunSlow', _.range(14, 24), 15, true);
@@ -47,7 +47,7 @@ class BlueMan{
 	jump(velocityY = -350){
 		//  Allow the player to jump if they are touching the ground.
 		this.player.body.velocity.y = velocityY;
-		if (this.player.facingRight) this.player.animations.play('jumpRight');
+		this.player.animations.play('jumpRight');
 	}
 
 	resetXvelocity(){

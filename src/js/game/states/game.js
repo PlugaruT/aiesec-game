@@ -50,7 +50,7 @@ game.create = function () {
 
     //  Our two animations, walking left and right.
     // player.animations.add('idle', [0], 12, false);
-    player.animations.add('jumpRight', _.range(7, 13), 10, false);
+    player.animations.add('jumpRight', _.range(7, 13), 15, false);
     player.animations.add('jumpLeft', _.range(31, 13), 10, false);
     player.animations.add('rightRun', _.range(14, 24), 24, true);
     player.animations.add('leftRun', _.range(38, 48), 24, true);

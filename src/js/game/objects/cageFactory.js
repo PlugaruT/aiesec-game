@@ -10,6 +10,10 @@ class CageFactory{
 		this.hitCageSound = this.game.add.audio('beep');
 	}
 
+	getCages(){
+		return this.cages;
+	}
+
 	addCage(chainLength){
 		var i;
 	    for(i = -chainLength; i < chainLength; i++){
@@ -18,7 +22,7 @@ class CageFactory{
 	    }
 
 	    // Create a cage at the position x and y
-	    var cage = this.game.add.sprite(this.game.world.width, i*13, 'cage');
+	    let cage = this.game.add.sprite(this.game.world.width, i*13, 'cage');
 	    cage.scale.setTo(0.4);
 	    cage.anchor.setTo(0.5, 0);
 
@@ -32,10 +36,10 @@ class CageFactory{
 	    cage.checkWorldBounds = true;
 	    cage.outOfBoundsKill = true;
 
-	    this.alternateY(cage, cage.y);
+	    this.alternateOnY(cage);
 	    
-		var dove = this.createDove(this.game.world.width, cage.y + cage.height/2);
-		this.alternateY(dove, dove.y);
+		let dove = this.createDove(this.game.world.width, cage.y + cage.height/2);
+		this.alternateOnY(dove);
 
 		this.cageDoveMap[cage] = dove;
 
@@ -69,12 +73,12 @@ class CageFactory{
 	    // Automatically kill the chain element when it's no longer visible
 	    // chain.checkWorldBounds = true;
 	    chain.outOfBoundsKill = true;
-	    
-	    this.alternateY(chain, chain.y);
+
+	    this.alternateOnY(chain);
 	}
 
 
-	freeDove(hittedCage) {
+	hitCage(hittedCage) {
 
 	    this.hitCageSound.play();
 	    
@@ -85,23 +89,35 @@ class CageFactory{
 	    this.game.physics.arcade.enable(dummyCage);
 	    dummyCage.body.velocity.x = this.velocityX;
 
-	    var dove = this.cageDoveMap[hittedCage];
-	    dove.kill();
+	    // the cageDoveMap returnd the reference to the dove inside the hitted cage
+	    // var dove = this.cageDoveMap[hittedCage];
+	    this.doveFly(this.cageDoveMap[hittedCage]);
 
 	    hittedCage.kill();
 
 	    // cage fade-out effect
 	    this.game.add.tween(dummyCage).to( { alpha: 0 }, 500, "Linear", true);
-	    
-	    // //  Add and update the score
-	    // score += 10;
-	    // scoreText.text = 'Score: ' + score;
+	    // cage fall effect (while fadding out)
+	    this.game.add.tween(dummyCage).to( { y: dummyCage.y + this.alternateDistY }, 1000, "Linear", true);
 	}
 
-	alternateY(sprite, y){
-		this.game.add.tween(sprite).to( { y: y + this.alternateDistY }, 
+	doveFly(dove){
+		// translate the dove up (on Y) out of the screen where the sprite gets killed
+		this.game.add.tween(dove).to({ y: -dove.height - 10 }, 1000, "Linear", true);
+
+		var xTranslation = getRandomInt(dove.x - 500, dove.x + 100);
+		this.game.add.tween(dove).to({ x: xTranslation }, 1000, "Linear", true);
+	}
+
+	alternateOnY(sprite){
+		this.game.add.tween(sprite).to( { y: sprite.y + this.alternateDistY }, 
 			1000, Phaser.Easing.Linear.None, true, 0, 1000, true);
 	}
+}
+
+
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 module.exports.CageFactory = CageFactory;

@@ -8,6 +8,8 @@ var cages;
 var hitCageSound;
 var BlueMan = require('../objects/blueMan.js');
 var CageFactory = require('../objects/cageFactory.js');
+var PosterFactory = require('../objects/posterFactory.js');
+var Platform = require('../objects/platform.js');
 // var cursors;
 
 game.create = function () {
@@ -34,18 +36,30 @@ game.create = function () {
 
     player = new BlueMan.BlueMan(game);
     cageFactory = new CageFactory.CageFactory(game);
+    posterFactory = new PosterFactory.PosterFactory(game);
 
     cursors = game.input.keyboard.createCursorKeys();
 
     this.timer = game.time.events.loop(3000, spawnCage, game);
+    this.timer = game.time.events.loop(3000, spawnPoster, game);
+    this.timer = game.time.events.loop(4000, spawnPlatform, game);
 
     scoreText = game.add.text(16, 16, 'score: 0', {fontSize: '32px', fill: '#000'});
 };
 
 
 game.update = function () {
+
+    // so that doves appears INSIDE the cage
+    game.world.bringToTop(cageFactory.cages);
+
     var hitPlatform = game.physics.arcade.collide(player.getBody(), platforms);
-    game.physics.arcade.overlap(player.getBody(), cageFactory.cages, hitCage, null, this);
+    
+    game.physics.arcade.overlap(player.getBody(), cageFactory.getCages(), 
+        playerCageCollision, null, this);
+    
+    game.physics.arcade.overlap(player.getBody(), posterFactory.getPosters(), 
+        playerPosterCollision, null, this);
 
     player.resetXvelocity();
 
@@ -59,13 +73,35 @@ game.update = function () {
     }
 };
 
+
 function spawnCage(){
-    var chainLength = Math.floor(Math.random() * 15) + 5;
+    var chainLength = Math.floor(Math.random() * 20) + 5;
     cageFactory.addCage(chainLength);
 }
 
-function hitCage(player, cage){
-    cageFactory.freeDove(cage);
+
+function spawnPoster(){
+    posterFactory.addPoster();
+}
+
+
+function spawnPlatform(){
+    var len = Math.floor(Math.random() * 5) + 1;
+    var plat = new Platform.Platform(game, game.world.width/2, game.world.height - 200, len);
+}
+
+
+function playerCageCollision(player, cage){
+    cageFactory.hitCage(cage);
+    
+    //  Add and update the score
+    score += 10;
+    scoreText.text = 'Score: ' + score;
+}
+
+
+function playerPosterCollision(player, poster){
+    poster.kill();
 }
 
 module.exports = game;
