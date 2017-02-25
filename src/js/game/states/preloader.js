@@ -18,8 +18,8 @@ preloader.preload = function () {
     this.game.load.image('mainMenu', 'images/menu.png');
     this.game.load.image('cage', 'images/cage.png');
     this.game.load.image('dove', 'images/dove.png');
-    this.game.load.image('chain', 'images/chain1.png');
-    // this.game.load.spritesheet('chain', 'images/chain.png', 16, 26);
+    // this.game.load.image('chain', 'images/chain1.png');
+    this.game.load.spritesheet('chain', 'images/chain.png', 16, 26);
 
     this.game.load.audio('birdJump', 'audio/jump.wav');
     this.game.load.audio('beep', 'audio/beep.mp3');

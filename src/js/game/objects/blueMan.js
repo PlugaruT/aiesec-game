@@ -7,24 +7,19 @@ class BlueMan{
 
 	createBlueMan(){
 		let player = this.game.add.sprite(100, this.game.world.height / 2, 'blueMan');
+		player.scale.setTo(0.8);
 		let _ = require('lodash');
     	this.game.physics.arcade.enable(player);
 
     	player.facingRight = true;
-
 	    player.body.bounce.y = 0.2;
-	    player.body.gravity.y = 600;
+	    player.body.gravity.y = 500;
 	    player.body.collideWorldBounds = true;
 
-	    //  Our two animations, walking left and right.
-	    // player.animations.add('idleRight', [0], 1, false);
-	    // player.animations.add('idleLeft', [24], 1, false);
 	    player.animations.add('jumpRight', _.range(7, 13), 10, false);
-	    // player.animations.add('jumpLeft', _.range(31, 13), 10, false);
 	    player.animations.add('rightRun', _.range(14, 24), 18, true);
-	    player.animations.add('rightRunFast', _.range(14, 24), 40, true);
-	    player.animations.add('rightRunSlow', _.range(14, 24), 12, true);
-	    // player.animations.add('leftRun', _.range(38, 48), 18, true);
+	    player.animations.add('rightRunFast', _.range(14, 24), 22, true);
+	    player.animations.add('rightRunSlow', _.range(14, 24), 15, true);
 	    
 	    return player;
 	}

@@ -84,7 +84,6 @@ game.update = function () {
         player.body.velocity.x = -320;
         // player.animations.play('leftRun');
         player.facingRight = false;
-
     }
     else if (cursors.right.isDown) {
         //      Move to the right
