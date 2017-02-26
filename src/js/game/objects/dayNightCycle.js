@@ -1,5 +1,4 @@
 class DayNightCycle {
-
     constructor(game, dayLength){
         this.game = game;
         this.dayLength = dayLength;

@@ -1,7 +1,7 @@
 var npmProperties = require('../../../package.json');
 
 module.exports =
-  { title: 'Aiesec Game'
+  { title: 'AIESEC în Chișinău'
   , description: npmProperties.description
   , port: 3017
   , liveReloadPort: 3018

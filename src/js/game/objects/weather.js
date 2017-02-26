@@ -24,17 +24,17 @@ class Weather {
     }, this);
   }
 
-  addRain() {
+  addRain(intensity) {
     let rainParticle = this.game.add.bitmapData(15, 50);
 
     rainParticle.ctx.rect(0, 0, 15, 50);
-    rainParticle.ctx.fillStyle = '#951c1a';
+    rainParticle.ctx.fillStyle = '#9cc9de';
     rainParticle.ctx.fill();
 
     this.emitter = this.game.add.emitter(this.game.world.centerX, -300, 200);
 
     this.emitter.width = this.game.world.width;
-    this.emitter.angle = 10;
+    this.emitter.angle = 15;
 
     this.emitter.makeParticles(rainParticle);
 
@@ -47,7 +47,7 @@ class Weather {
     this.emitter.minRotation = 0;
     this.emitter.maxRotation = 0;
 
-    this.emitter.start(false, 2000, 1);
+    this.emitter.start(false, 2000, intensity);
   }
 
   removeRain() {
