@@ -1,5 +1,6 @@
 var game = {};
 var score = 0;
+var scoreSprite;
 var scoreText;
 var _ = require('lodash');
 var player;
@@ -10,6 +11,7 @@ var BlueMan = require('../objects/blueMan.js');
 var CageFactory = require('../objects/cageFactory.js');
 var PosterFactory = require('../objects/posterFactory.js');
 var Platform = require('../objects/platform.js');
+var winScore = 10;
 // var cursors;
 
 game.create = function () {
@@ -44,7 +46,9 @@ game.create = function () {
     this.timer = game.time.events.loop(3000, spawnPoster, game);
     this.timer = game.time.events.loop(4000, spawnPlatform, game);
 
-    scoreText = game.add.text(16, 16, 'score: 0', {fontSize: '32px', fill: '#000'});
+    // scoreText = game.add.text(16, 16, 'score: 0', {fontSize: '32px', fill: '#000'});
+    scoreSprite = this.game.add.sprite(16, 16, 'peace_progress', 0);
+    scoreSprite.scale.setTo(0.5);
 };
 
 
@@ -95,8 +99,9 @@ function playerCageCollision(player, cage){
     cageFactory.hitCage(cage);
     
     //  Add and update the score
-    score += 10;
-    scoreText.text = 'Score: ' + score;
+    score += 1;
+    if(score > winScore) return;
+    else scoreSprite.frame = score;
 }
 
 
