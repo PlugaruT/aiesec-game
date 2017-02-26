@@ -2,6 +2,8 @@ class Platform{
 
 	constructor(game, x, y, len){
 		this.game = game;
+		this.platform = this.game.add.group();
+		this.platform.enableBody = true;
 		this.velocityX = -150;
 		this.createPlatform(x, y, len);
 	}
@@ -22,10 +24,12 @@ class Platform{
 
 	    // Add velocity to the poster to make it move left
 	    block.body.velocity.x = this.velocityX;
-
+	    block.body.immovable = true;
 	    // Automatically kill the poster when it's no longer visible
 	    block.checkWorldBounds = true;
 	    block.outOfBoundsKill = true;
+
+	    this.platform.add(block);
 	}
 
 

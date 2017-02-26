@@ -4,8 +4,12 @@ class CageFactory{
 		this.game = game;
 		this.cages = this.game.add.group();
 		this.cages.enableBody = true;
+		this.chains = this.game.add.group();
+		this.chains.enableBody = true;
+		this.doves = this.game.add.group();
+		this.doves.enableBody = true;
 		this.velocityX = -150;
-		this.alternateDistY = 50;
+		this.alternateDistY = 40;
 		this.cageDoveMap = {};
 		this.hitCageSound = this.game.add.audio('beep');
 	}
@@ -14,15 +18,15 @@ class CageFactory{
 		return this.cages;
 	}
 
-	addCage(chainLength){
+	addCage(chainLength, x){
 		var i;
 	    for(i = -chainLength; i < chainLength; i++){
-	        if(i%2 == 0) this.addChain(this.game.world.width, i*13, 0);
-	        else this.addChain(this.game.world.width, i*13, 1);
+	        if(i%2 == 0) this.addChain(x, i*13, 0);
+	        else this.addChain(x, i*13, 1);
 	    }
 
 	    // Create a cage at the position x and y
-	    let cage = this.game.add.sprite(this.game.world.width, i*13, 'cage');
+	    let cage = this.game.add.sprite(x, i*13, 'cage');
 	    cage.scale.setTo(0.4);
 	    cage.anchor.setTo(0.5, 0);
 
@@ -32,13 +36,9 @@ class CageFactory{
 	    // Add velocity to the cage to make it move left
 	    cage.body.velocity.x = this.velocityX;
 
-	    // Automatically kill the cage when it's no longer visible
-	    cage.checkWorldBounds = true;
-	    cage.outOfBoundsKill = true;
-
 	    this.alternateOnY(cage);
 	    
-		let dove = this.createDove(this.game.world.width, cage.y + cage.height/2);
+		let dove = this.createDove(x, cage.y + cage.height/2);
 		this.alternateOnY(dove);
 
 		this.cageDoveMap[cage] = dove;
@@ -53,8 +53,7 @@ class CageFactory{
 	    dove.anchor.setTo(0.5, 0);
 	    this.game.physics.arcade.enable(dove);
 	    dove.body.velocity.x = this.velocityX;
-	    dove.checkWorldBounds = true;
-	    dove.outOfBoundsKill = true;
+	    this.doves.add(dove);
 	    return dove;
 	}
 
@@ -70,11 +69,22 @@ class CageFactory{
 	    // Add velocity to the pipe to make it move left
 	    chain.body.velocity.x = this.velocityX;
 
-	    // Automatically kill the chain element when it's no longer visible
-	    // chain.checkWorldBounds = true;
-	    chain.outOfBoundsKill = true;
-
 	    this.alternateOnY(chain);
+	    this.chains.add(chain);
+	}
+
+	killThemAll(){
+		this.chains.forEach(function(chain){
+			if(chain.x < 0) chain.kill();
+		});
+
+		this.cages.forEach(function(cage){
+			if(cage.x < 0) cage.kill();
+		});
+
+		this.doves.forEach(function(dove){
+			if(dove.x < 0 || dove.y < -dove.height) dove.kill();
+		});
 	}
 
 
@@ -89,9 +99,9 @@ class CageFactory{
 	    this.game.physics.arcade.enable(dummyCage);
 	    dummyCage.body.velocity.x = this.velocityX;
 
-	    // the cageDoveMap returnd the reference to the dove inside the hitted cage
-	    // var dove = this.cageDoveMap[hittedCage];
-	    this.doveFly(this.cageDoveMap[hittedCage]);
+	    // return the dove that is inside the hitted cage
+	    var dove = this.doves.iterate('x', hittedCage.x, Phaser.Group.RETURN_CHILD);
+	    this.doveFly(dove);
 
 	    hittedCage.kill();
 
@@ -114,7 +124,6 @@ class CageFactory{
 			1000, Phaser.Easing.Linear.None, true, 0, 1000, true);
 	}
 }
-
 
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;

@@ -4,7 +4,7 @@ class PosterFactory{
 		this.game = game;
 		this.posters = this.game.add.group();
 		this.posters.enableBody = true;
-		this.velocityX = -150;
+		this.velocityX = -100;
 	}
 
 	getPosters(){
@@ -16,7 +16,7 @@ class PosterFactory{
 	    var poster = this.game.add.sprite(this.game.world.width, 
 	    								  this.game.world.height - 64, 'poster');
 	    poster.scale.setTo(0.6);
-	    poster.anchor.setTo(0, 1);
+	    poster.anchor.setTo(1, 1);
 
 	    // Enable physics on the poster
 	    this.game.physics.arcade.enable(poster);
@@ -27,6 +27,11 @@ class PosterFactory{
 	    // Automatically kill the poster when it's no longer visible
 	    poster.checkWorldBounds = true;
 	    poster.outOfBoundsKill = true;
+
+	    poster.body.width = poster.width/2;    
+	    poster.body.height = poster.height/2;
+
+	    // this.game.debug.renderPhysicsBody(poster.body);
 
 	    this.posters.add(poster);
 	}

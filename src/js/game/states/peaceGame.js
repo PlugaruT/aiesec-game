@@ -42,9 +42,9 @@ game.create = function () {
 
     cursors = game.input.keyboard.createCursorKeys();
 
-    this.timer = game.time.events.loop(3000, spawnCage, game);
-    this.timer = game.time.events.loop(3000, spawnPoster, game);
-    this.timer = game.time.events.loop(4000, spawnPlatform, game);
+    this.timer = game.time.events.loop(5000, spawnCage, game);
+    this.timer = game.time.events.loop(6000, spawnPoster, game);
+    // this.timer = game.time.events.loop(4000, spawnPlatform, game);
 
     // scoreText = game.add.text(16, 16, 'score: 0', {fontSize: '32px', fill: '#000'});
     scoreSprite = this.game.add.sprite(16, 16, 'peace_progress', 0);
@@ -75,12 +75,25 @@ game.update = function () {
     if (cursors.up.isDown && player.getBody().body.touching.down && hitPlatform) {
         player.jump();
     }
+
+    // kills the chain, cage and dove once they are offscreen (on the left)
+    cageFactory.killThemAll();
 };
 
 
 function spawnCage(){
-    var chainLength = Math.floor(Math.random() * 20) + 5;
-    cageFactory.addCage(chainLength);
+    var chainLength = Math.floor(Math.random() * 10) + 3;
+    var platformLength = 0;
+    var displacement = 0;
+
+    // if cage is unreachable than we need a platform
+    if(chainLength < 7){
+        platformLength = Math.floor(Math.random() * 5) + 3;
+        createPlatform(game.world.width, game.world.height - 250 + chainLength*10, platformLength);
+        displacement = 120;
+    }
+
+    cageFactory.addCage(chainLength, game.world.width + platformLength*50 + displacement);
 }
 
 
@@ -89,9 +102,16 @@ function spawnPoster(){
 }
 
 
-function spawnPlatform(){
-    var len = Math.floor(Math.random() * 5) + 1;
-    var plat = new Platform.Platform(game, game.world.width/2, game.world.height - 200, len);
+function createPlatform(x, y, len){
+    for(var i = 0; i < len; i++){
+        var block = platforms.create(x + i*50, y, 'pipe');
+        block.body.immovable = true;
+        block.body.velocity.x = -150;
+
+        block.body.checkCollision.down = false;
+        block.body.checkCollision.left = false;
+        block.body.checkCollision.right = false;
+    }    
 }
 
 
