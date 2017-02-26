@@ -6,7 +6,7 @@ var _ = require('lodash')
     , game: require('./states/game.js')
     , flappy: require('./states/flappy.js')
     }
-  , game = new Phaser.Game(properties.size.x, properties.size.y, Phaser.AUTO, 'game');
+  , game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.AUTO, 'game');
 
 // Automatically register each state.
 _.each(states, function(state, key) {

@@ -12,6 +12,7 @@ preloader.preload = function () {
     this.game.load.image('star', 'images/star.png');
     this.game.load.image('bird', 'images/bird.png');
     this.game.load.image('pipe', 'images/pipe.png');
+    this.game.load.image('longPipe', 'images/rectangle.png');
     this.game.load.spritesheet('dude', 'images/dude.png', 32, 48);
     this.game.load.spritesheet('blueMan', 'images/blueman.png', 150, 172, 48);
     this.game.load.spritesheet('buttons', 'images/buttons.png', 500, 500, 9);

@@ -1,7 +1,8 @@
 class FlappyBird {
 
-  constructor(game) {
+  constructor(game, spriteName, positionX, positionY) {
     this.game = game;
+    this.createBird(spriteName, positionX, positionY);
   }
 
   createBird(spriteName, positionX, positionY) {
@@ -39,7 +40,7 @@ class FlappyBird {
     this.jumpSound.play();
     this.bird.body.velocity.y = -velocity;
     // Create an animation on the bird
-    this.game.add.tween(this.bird).to({angle: -20}, 100).start();
+    // this.game.add.tween(this.bird).to({angle: -20}, 100).start();
   }
 
 }
