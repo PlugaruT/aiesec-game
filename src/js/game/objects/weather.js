@@ -28,13 +28,13 @@ class Weather {
     let rainParticle = this.game.add.bitmapData(15, 50);
 
     rainParticle.ctx.rect(0, 0, 15, 50);
-    rainParticle.ctx.fillStyle = '#951c1a';
+    rainParticle.ctx.fillStyle = '#AAA';
     rainParticle.ctx.fill();
 
     this.emitter = this.game.add.emitter(this.game.world.centerX, -300, 200);
 
     this.emitter.width = this.game.world.width;
-    this.emitter.angle = 10;
+    this.emitter.angle = 15;
 
     this.emitter.makeParticles(rainParticle);
 
