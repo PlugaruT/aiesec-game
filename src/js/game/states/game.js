@@ -44,7 +44,7 @@ game.create = function () {
   'mountains-mid2'
   );
   
-  this.weather.addRain();
+  this.weather.addRain(1);
   // this.weather.addFog();
   
   let backgroundSprites = [
