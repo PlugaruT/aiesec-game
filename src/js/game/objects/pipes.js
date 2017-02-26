@@ -1,14 +1,19 @@
 class Pipes {
 
-  constructor(game, pipeSprite, playerHeight) {
+  constructor(game, pipeSprite, pipeVelocity, playerHeight) {
     this.game = game;
     this.pipes = this.game.add.group();
     this.pipeSprite = pipeSprite;
+    this.pipeVelocity = pipeVelocity;
     this.playerHeight = playerHeight;
   }
 
   getPipeBodies() {
     return this.pipes;
+  }
+
+  setVelocity(pipeVelocity) {
+    this.pipeVelocity = pipeVelocity;
   }
 
   addOnePipe(fromTop, stopAt) {
@@ -32,7 +37,7 @@ class Pipes {
     // Enable physics on the pipe
     this.game.physics.arcade.enable(pipe);
     // Add velocity to the pipe to make it move left
-    pipe.body.velocity.x = -200;
+    pipe.body.velocity.x = this.pipeVelocity;
 
     // Automatically kill the pipe when it's no longer visible
     pipe.checkWorldBounds = true;
@@ -41,7 +46,9 @@ class Pipes {
 
   addRowOfPipes() {
     let gameHeight = this.game.world.height;
-    let startHole = Math.floor(Math.random() * gameHeight);
+    let allowedMin = gameHeight / 5;
+    let allowedMax = (4 * gameHeight) / 5;
+    let startHole = Math.floor(Math.random() * (allowedMax - allowedMin + 1) + allowedMin);
     let endHole = startHole + this.playerHeight * 3;
 
     this.addOnePipe(true, startHole);

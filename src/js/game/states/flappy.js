@@ -19,7 +19,7 @@ game.create = function () {
 
   bird = new FlappyBird.FlappyBird(this.game, 'bird', game.world.width / 4, game.world.height / 2);
 
-  pipes = new Pipes.Pipes(game, 'longPipe', bird.getBody().height);
+  pipes = new Pipes.Pipes(game, 'longPipe', -200, bird.getBody().height);
 
   // Call the 'jump' function when the spacekey is hit
   spaceKey = game.input.keyboard.addKey(
