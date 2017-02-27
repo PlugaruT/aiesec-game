@@ -14,6 +14,7 @@ class CageFactory{
 		this.hitCageSound = this.game.add.audio('beep');
 	}
 
+
 	getCages(){
 		return this.cages;
 	}
@@ -38,7 +39,7 @@ class CageFactory{
 
 	    this.alternateOnY(cage);
 	    
-		let dove = this.createDove(x, cage.y + cage.height/2);
+		let dove = this.createDove(x, cage.y + cage.height/2 - 10);
 		this.alternateOnY(dove);
 
 		this.cageDoveMap[cage] = dove;
@@ -48,11 +49,18 @@ class CageFactory{
 
 
 	createDove(x, y){
-		let dove = this.game.add.sprite(x, y, 'dove');
-	    dove.scale.setTo(0.2);
+		let _ = require('lodash');
+		let dove = this.game.add.sprite(x, y, 'dove1');
+	    dove.scale.setTo(0.6);
 	    dove.anchor.setTo(0.5, 0);
 	    this.game.physics.arcade.enable(dove);
 	    dove.body.velocity.x = this.velocityX;
+
+	    dove.animations.add('rightFly', _.range(0, 6), 12, true);
+	    dove.animations.add('leftFly', _.range(6, 12), 12, true);
+
+	    dove.animations.play('leftFly');
+
 	    this.doves.add(dove);
 	    return dove;
 	}
@@ -116,6 +124,7 @@ class CageFactory{
 		this.game.add.tween(dove).to({ y: -dove.height - 10 }, 1000, "Linear", true);
 
 		var xTranslation = getRandomInt(dove.x - 500, dove.x + 100);
+		if(xTranslation > dove.x) dove.animations.play('rightFly');
 		this.game.add.tween(dove).to({ x: xTranslation }, 1000, "Linear", true);
 	}
 

@@ -5,12 +5,13 @@ var scoreText;
 var _ = require('lodash');
 var player;
 var platforms;
+var groundBlocks;
 var cages;
 var hitCageSound;
 var BlueMan = require('../objects/blueMan.js');
 var CageFactory = require('../objects/cageFactory.js');
 var PosterFactory = require('../objects/posterFactory.js');
-var Platform = require('../objects/platform.js');
+var TrampolineFactory = require('../objects/trampolineFactory.js');
 var winScore = 10;
 // var cursors;
 
@@ -19,31 +20,37 @@ game.create = function () {
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
     //  A simple background for our game
-    game.add.sprite(0, 0, 'sky');
+    var sky = game.add.sprite(0, 0, 'sky');
+    sky.scale.setTo(2,1);
 
-    //  The platforms group contains the ground and the 2 ledges we can jump on
-    platforms = game.add.group();
+    createGround();
 
-    //  We will enable physics for any object that is created in this group
-    platforms.enableBody = true;
+    // //  The platforms group contains the ground and the 2 ledges we can jump on
+    // platforms = game.add.group();
 
-    // Here we create the ground.
-    var ground = platforms.create(0, game.world.height - 64, 'ground');
+    // //  We will enable physics for any object that is created in this group
+    // platforms.enableBody = true;
 
-    //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-    ground.scale.setTo(2, 2);
+    // // Here we create the ground.
+    // var ground = platforms.create(0, game.world.height - 64, 'ground');
 
-    //  This stops it from falling away when you jump on it
-    ground.body.immovable = true;
+    // //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
+    // ground.scale.setTo(2, 2);
+
+    // //  This stops it from falling away when you jump on it
+    // ground.body.immovable = true;
 
     player = new BlueMan.BlueMan(game);
     cageFactory = new CageFactory.CageFactory(game);
     posterFactory = new PosterFactory.PosterFactory(game);
+    trampolineFactory = new TrampolineFactory.TrampolineFactory(game);
 
     cursors = game.input.keyboard.createCursorKeys();
 
-    this.timer = game.time.events.loop(5000, spawnCage, game);
-    this.timer = game.time.events.loop(6000, spawnPoster, game);
+    this.timer = game.time.events.loop(6000, spawnCage, game);
+    this.timer = game.time.events.loop(10000, spawnPoster, game);
+    this.timer = game.time.events.loop(12000, spawnTrampoline, game);
+    this.timer = game.time.events.loop(300, addGround, game);
     // this.timer = game.time.events.loop(4000, spawnPlatform, game);
 
     // scoreText = game.add.text(16, 16, 'score: 0', {fontSize: '32px', fill: '#000'});
@@ -57,13 +64,17 @@ game.update = function () {
     // so that doves appears INSIDE the cage
     game.world.bringToTop(cageFactory.cages);
 
-    var hitPlatform = game.physics.arcade.collide(player.getBody(), platforms);
+    var hitPlatform = game.physics.arcade.collide(player.getBody(), platforms) ||
+                        game.physics.arcade.collide(player.getBody(), groundBlocks);
     
     game.physics.arcade.overlap(player.getBody(), cageFactory.getCages(), 
         playerCageCollision, null, this);
     
     game.physics.arcade.overlap(player.getBody(), posterFactory.getPosters(), 
         playerPosterCollision, null, this);
+
+    game.physics.arcade.overlap(player.getBody(), trampolineFactory.getTrampolines(), 
+        playerTrampolineCollision, null, this);
 
     player.resetXvelocity();
 
@@ -78,6 +89,10 @@ game.update = function () {
 
     // kills the chain, cage and dove once they are offscreen (on the left)
     cageFactory.killThemAll();
+
+    groundBlocks.forEach(function(block){
+        block.body.x -= 3;
+    });
 };
 
 
@@ -96,15 +111,54 @@ function spawnCage(){
     cageFactory.addCage(chainLength, game.world.width + platformLength*50 + displacement);
 }
 
+function spawnTrampoline(){
+    trampolineFactory.addTrampoline();
+}
 
 function spawnPoster(){
     posterFactory.addPoster();
 }
 
 
+function createGround(){
+
+    //  The platforms group contains the ground and the 2 ledges we can jump on
+    platforms = game.add.group();
+    groundBlocks = game.add.group();
+
+    //  We will enable physics for any object that is created in this group
+    platforms.enableBody = true;
+    groundBlocks.enableBody = true;
+
+    var groundLength = parseInt(game.world.width / 64);
+
+    for(var i = 0; i < groundLength + 1; i++){
+        var ground = platforms.create(i*64, game.world.height - 64, 'ground');    
+        ground.body.immovable = true;
+        ground.checkWorldBounds = true;
+        ground.outOfBoundsKill = true;
+        groundBlocks.add(ground);
+    }
+}
+
+function addGround(){
+    var ground = platforms.create(game.world.width, game.world.height - 64, 'ground');    
+        ground.body.immovable = true;
+        groundBlocks.add(ground);
+        ground.checkWorldBounds = true;
+        ground.outOfBoundsKill = true;
+}
+
+
 function createPlatform(x, y, len){
+    var frame = 0;
     for(var i = 0; i < len; i++){
-        var block = platforms.create(x + i*50, y, 'pipe');
+
+        if(i == 0) frame = 0;
+        else if (i == len - 1) frame = 2;
+        else frame = 1;
+
+        var block = platforms.create(x + i*50, y, 'blocks', frame);
         block.body.immovable = true;
         block.body.velocity.x = -150;
 
@@ -117,16 +171,28 @@ function createPlatform(x, y, len){
 
 function playerCageCollision(player, cage){
     cageFactory.hitCage(cage);
-    
-    //  Add and update the score
-    score += 1;
-    if(score > winScore) return;
-    else scoreSprite.frame = score;
+    changeScore(1);
 }
 
 
 function playerPosterCollision(player, poster){
     poster.kill();
+    changeScore(-1);
 }
+
+function playerTrampolineCollision(player, trampoline){
+    game.add.tween(player).to({ y: 10 }, 700, Phaser.Easing.Quadratic.Out, true);
+}
+
+
+function changeScore(unit){
+    //  Add and update the score
+    score += unit;
+    if(score > winScore) score = winScore;
+    else if (score < 0) score = 0;
+       
+    scoreSprite.frame = score;
+}
+
 
 module.exports = game;

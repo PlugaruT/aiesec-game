@@ -13,7 +13,7 @@ class BlueMan{
 
     	player.facingRight = true;
 	    player.body.bounce.y = 0.2;
-	    player.body.gravity.y = 400;
+	    player.body.gravity.y = 380;
 	    player.body.collideWorldBounds = true;
 
 	    player.animations.add('jumpRight', _.range(7, 13), 2, false);

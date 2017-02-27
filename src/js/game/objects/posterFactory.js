@@ -5,6 +5,7 @@ class PosterFactory{
 		this.posters = this.game.add.group();
 		this.posters.enableBody = true;
 		this.velocityX = -100;
+		this.frame = -1;
 	}
 
 	getPosters(){
@@ -12,11 +13,13 @@ class PosterFactory{
 	}
 
 	addPoster(){
+		this.frame += 1;
+		if(this.frame >= 5) this.frame = 0
 		// Create a poster at the position x and y
 	    var poster = this.game.add.sprite(this.game.world.width, 
-	    								  this.game.world.height - 64, 'poster');
+	    								  this.game.world.height - 64, 'posters', this.frame);
 	    poster.scale.setTo(0.6);
-	    poster.anchor.setTo(1, 1);
+	    poster.anchor.setTo(0.5, 1);
 
 	    // Enable physics on the poster
 	    this.game.physics.arcade.enable(poster);
