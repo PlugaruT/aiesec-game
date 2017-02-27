@@ -22,6 +22,7 @@ class Pipes {
 
     let pipe = this.game.add.sprite(this.game.world.width, 0, 'towers', index);
 
+
     pipe.anchor.setTo(0.5);
     // pipe.scale.setTo(.2);
 

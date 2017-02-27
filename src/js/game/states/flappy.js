@@ -6,7 +6,7 @@ var Weather = require('../objects/weather.js');
 var DayNightCycle = require('../objects/dayNightCycle.js');
 
 var game = {};
-var score = 0;
+game.score = 0;
 var scoreText;
 var pipes;
 var bird;
@@ -100,7 +100,7 @@ game.create = function () {
 
   this.timer = game.time.events.loop(3000, pipes.addRowOfPipes, pipes);
 
-  scoreText = game.add.text(16, 16, score, {fontSize: '32px', fill: '#c05f44'});
+  scoreText = game.add.text(16, 16, game.score, {fontSize: '32px', fill: '#c05f44'});
 
   pauseMenu = new PauseMenu.PauseMenu(game);
 
@@ -111,6 +111,10 @@ game.update = function () {
   game.physics.arcade.overlap(bird.getBody(), pipes.getPipeBodies(), hitPipe, null, game);
   if (bird.checkBoundaries(0, game.world.height))
     restartGame();
+  else if (addScore(bird.getBody(), pipes.getPipeBodies())) {
+    game.score += 1;
+    scoreText.setText(game.score);
+  }
 
   updateMoutains(this);
 };
@@ -123,6 +127,17 @@ game.render = function () {
     game.game.debug.body(bird.getBody());
   }
 };
+
+function addScore(bird, pipes) {
+  let passedWall = false;
+  pipes.forEachAlive(function (pipe) {
+    if (!pipe.scored && pipe.x <= bird.x) {
+      passedWall = true;
+      pipe.scored = true;
+    }
+  });
+  return passedWall;
+}
 
 function onPause() {
   game.time.events.remove(this.timer);
@@ -165,6 +180,7 @@ function jump() {
 }
 
 function restartGame() {
+  game.score = 0;
   game.state.start('flappy');
   // score = 0;
 }
