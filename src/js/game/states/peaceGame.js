@@ -11,6 +11,7 @@ var hitCageSound;
 var winScore = 10;
 var jumptimer = 0;
 var trampolineJumpSound;
+var hitPosterSound;
 
 var BlueMan = require('../objects/blueMan.js');
 var CageFactory = require('../objects/cageFactory.js');
@@ -24,6 +25,10 @@ game.create = function () {
     //  We're going to be using physics, so enable the P2 Physics system
     game.physics.startSystem(Phaser.Physics.ARCADE);
     game.physics.arcade.gravity.y = 700;
+
+    var music = game.add.audio('music');
+    music.loop = true;
+    music.play();
 
         //------------ WEATHER------------
     let scaleRatio = window.devicePixelRatio / 2;
@@ -103,18 +108,23 @@ game.create = function () {
     trampolineFactory = new TrampolineFactory.TrampolineFactory(game);
 
     trampolineJumpSound = game.add.audio('trampoline_jump');
+    hitPosterSound = game.add.audio('hit_poster');
 
     cursors = game.input.keyboard.createCursorKeys();
 
     this.timer = game.time.events.loop(6000, spawnCage, game);
-    this.timer = game.time.events.loop(10000, spawnPoster, game);
-    this.timer = game.time.events.loop(12000, spawnTrampoline, game);
-    this.timer = game.time.events.loop(300, addGround, game);
+    this.timer = game.time.events.loop(12000, spawnPoster, game);
+    this.timer = game.time.events.loop(15000, spawnTrampoline, game);
+    this.timer = game.time.events.loop(350, addGround, game);
     // this.timer = game.time.events.loop(4000, spawnPlatform, game);
 
     // scoreText = game.add.text(16, 16, 'score: 0', {fontSize: '32px', fill: '#000'});
-    scoreSprite = this.game.add.sprite(16, 16, 'peace_progress', 0);
+    var doveScoreSprite = this.game.add.sprite(25, 25, 'dove');
+    doveScoreSprite.scale.setTo(0.15);
+    doveScoreSprite.anchor.setTo(0.5)
+    scoreSprite = this.game.add.sprite(25 + doveScoreSprite.width/1.5, 25, 'peace_progress', 0);
     scoreSprite.scale.setTo(0.5);
+    scoreSprite.anchor.setTo(0, 0.5)
 
 };
 
@@ -151,9 +161,8 @@ game.update = function () {
     cageFactory.killThemAll();
 
     groundBlocks.forEach(function(block){
-        block.body.x -= 3;
+        block.body.x -= 4;
     });
-
 
     this.mountainsBack.tilePosition.x -= 0.1;
     this.mountainsMid1.tilePosition.x -= 0.3;
@@ -244,13 +253,9 @@ function playerCageCollision(player, cage){
 
 
 function playerPosterCollision(player, poster){
-    poster.kill();
+    hitPosterSound.play();
     changeScore(-1);
-
-    // // cage fade-out effect
-    // var fadeOutPoster = this.game.add.tween(poster).to( { alpha: 0 }, 500, "Linear", true);
-
-    // fadeOutPoster.onComplete.add(function(poster){ poster.kill(); }, this);
+    poster.kill();
 }
 
 function playerTrampolineCollision(player, trampoline){

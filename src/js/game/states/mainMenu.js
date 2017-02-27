@@ -97,7 +97,8 @@ game.create = function () {
 
     buttonLevelup = game.add.button(firstButtonX+ 2*scaleButtons*1000 + 10, buttonY, 'buttons',
         function(){
-          game.state.start("game");  
+          // game.state.start("game");  
+          window.open("http://aiesec.md/aplica",'_blank');
         },
         this, 7, 6 ,8).scale.setTo(scaleButtons);
 

@@ -28,7 +28,7 @@ class TrampolineFactory{
 
 	    // this.game.debug.renderPhysicsBody(poster.body);
 
-	    trampoline.animations.add('glow', [0, 1, 2, 3], 10, true);
+	    trampoline.animations.add('glow', [0, 1], 10, true);
 	    trampoline.animations.play('glow');
 
 	    trampoline.body.checkCollision.down = false;
