@@ -2,9 +2,10 @@ var preloader = {};
 
 preloader.preload = function () {
   this.game.load.image('bird', 'images/bird.png');
-  this.game.load.image('longPipe', 'images/rectangle.png');
 
+  this.game.load.image('longPipe', 'images/rectangle.png');
   this.game.load.audio('birdJump', 'audio/jump.wav');
+
   this.game.load.audio('beep', 'audio/beep.mp3');
 
   this.game.load.image('mountains-backk', 'images/3.png');

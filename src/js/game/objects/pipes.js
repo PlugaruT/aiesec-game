@@ -55,11 +55,14 @@ class Pipes {
     this.addOnePipe(false, endHole);
   }
 
-  stopPipes() {
-    // Go through all the pipes, and stop their movement
+  setPipesVelocity(velocity) {
     this.pipes.forEach(function (pipe) {
-      pipe.body.velocity.x = 0;
+      pipe.body.velocity.x = velocity;
     }, this.game);
+  }
+
+  stopPipes() {
+    this.setPipesVelocity(0);
   }
 
 }
