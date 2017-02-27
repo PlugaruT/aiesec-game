@@ -8,13 +8,16 @@ var platforms;
 var groundBlocks;
 var cages;
 var hitCageSound;
+var winScore = 10;
+var jumptimer = 0;
+var trampolineJumpSound;
+
 var BlueMan = require('../objects/blueMan.js');
 var CageFactory = require('../objects/cageFactory.js');
 var PosterFactory = require('../objects/posterFactory.js');
 var TrampolineFactory = require('../objects/trampolineFactory.js');
-var winScore = 10;
-var jumptimer = 0;
-var trampolineJumpSound;
+var Weather = require('../objects/weather.js');
+var DayNightCycle = require('../objects/dayNightCycle.js');
 // var cursors;
 
 game.create = function () {
@@ -22,9 +25,60 @@ game.create = function () {
     game.physics.startSystem(Phaser.Physics.ARCADE);
     game.physics.arcade.gravity.y = 700;
 
-    //  A simple background for our game
-    var sky = game.add.sprite(0, 0, 'sky');
-    sky.scale.setTo(2,1);
+        //------------ WEATHER------------
+    let scaleRatio = window.devicePixelRatio / 2;
+
+    this.weather = new Weather.Weather(this.game);
+
+    this.dayNightCycle = new DayNightCycle.DayNightCycle(this.game, 30000);
+
+    let bgBitMap = this.game.add.bitmapData(this.game.width, this.game.height);
+
+    bgBitMap.ctx.rect(0, 0, this.game.width, this.game.height);
+    bgBitMap.ctx.fillStyle = '#b2ddc8';
+    bgBitMap.ctx.fill();
+
+    this.backgroundSprite = this.game.add.sprite(0, 0, bgBitMap);
+
+    this.sunSprite = this.game.add.sprite(50, -250, 'sun');
+    this.sunSprite.scale.setTo(scaleRatio);
+    this.moonSprite = this.game.add.sprite(this.game.width - (this.game.width / 4), this.game.height + 500, 'moon');
+
+
+    this.mountainsBack = this.game.add.tileSprite(0,
+        this.game.height - this.game.cache.getImage('mountains-back').height,
+        this.game.width,
+        this.game.cache.getImage('mountains-back').height,
+        'mountains-back'
+    );
+
+    this.mountainsMid1 = this.game.add.tileSprite(0,
+        this.game.height - this.game.cache.getImage('mountains-mid1').height,
+        this.game.width,
+        this.game.cache.getImage('mountains-mid1').height,
+        'mountains-mid1'
+    );
+
+    this.mountainsMid2 = this.game.add.tileSprite(0,
+        this.game.height - this.game.cache.getImage('mountains-mid2').height,
+        this.game.width,
+        this.game.cache.getImage('mountains-mid2').height,
+        'mountains-mid2'
+    );
+
+    this.weather.addRain(1);
+    this.weather.addFog();
+
+    let backgroundSprites = [
+        {sprite: this.backgroundSprite, from: 0x1f2a27, to: 0xB2DDC8},
+        {sprite: this.mountainsBack, from: 0x2f403b, to: 0x96CCBB},
+        {sprite: this.mountainsMid1, from: 0x283632, to: 0x8BBCAC},
+        {sprite: this.mountainsMid2, from: 0x202b28, to: 0x82AD9D}
+    ];
+
+    this.dayNightCycle.initShading(backgroundSprites);
+    this.dayNightCycle.initSun(this.sunSprite);
+    this.dayNightCycle.initMoon(this.moonSprite);
 
     createGround();
 
@@ -61,13 +115,20 @@ game.create = function () {
     // scoreText = game.add.text(16, 16, 'score: 0', {fontSize: '32px', fill: '#000'});
     scoreSprite = this.game.add.sprite(16, 16, 'peace_progress', 0);
     scoreSprite.scale.setTo(0.5);
+
 };
 
 
 game.update = function () {
 
     // so that doves appears INSIDE the cage
+    // game.world.bringToTop(cageFactory.doves);
+    // game.world.bringToTop(cageFactory.chains);
     game.world.bringToTop(cageFactory.cages);
+    // game.world.bringToTop(platforms);
+    // game.world.bringToTop(groundBlocks);
+    // game.world.bringToTop(posterFactory.getPosters());
+    // game.world.bringToTop(platforms);
 
     var hitPlatform = game.physics.arcade.collide(player.getBody(), platforms) ||
                         game.physics.arcade.collide(player.getBody(), groundBlocks);
@@ -98,6 +159,11 @@ game.update = function () {
     groundBlocks.forEach(function(block){
         block.body.x -= 3;
     });
+
+
+    this.mountainsBack.tilePosition.x -= 0.1;
+    this.mountainsMid1.tilePosition.x -= 0.3;
+    this.mountainsMid2.tilePosition.x -= 0.75;
 };
 
 

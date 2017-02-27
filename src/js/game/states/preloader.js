@@ -16,6 +16,12 @@ preloader.preload = function () {
     this.game.load.image('cage', 'images/cage.png');
     this.game.load.image('dove', 'images/dove.png');
     this.game.load.image('poster', 'images/poster.png');
+    this.game.load.image('mountains-backk', 'images/3.png');
+    this.game.load.image('mountains-back', 'images/2.png');
+    this.game.load.image('mountains-mid1', 'images/1.png');
+    this.game.load.image('mountains-mid2', 'images/0.png');
+    this.game.load.image('sun', 'images/sun.png');
+    this.game.load.image('moon', 'images/moon.png');
 
     this.game.load.spritesheet('dude', 'images/dude.png', 32, 48);
     this.game.load.spritesheet('blueMan', 'images/blueman.png', 150, 172, 48);
