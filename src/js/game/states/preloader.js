@@ -12,7 +12,7 @@ preloader.preload = function () {
     this.game.load.image('star', 'images/star.png');
     this.game.load.image('bird', 'images/bird.png');
     this.game.load.image('pipe', 'images/pipe.png');
-    this.game.load.image('mainMenu', 'images/menu.png');
+    this.game.load.image('mainMenu', 'images/logo.png');
     this.game.load.image('cage', 'images/cage.png');
     this.game.load.image('dove', 'images/dove.png');
     this.game.load.image('poster', 'images/poster.png');

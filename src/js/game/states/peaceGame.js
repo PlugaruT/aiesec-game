@@ -122,13 +122,7 @@ game.create = function () {
 game.update = function () {
 
     // so that doves appears INSIDE the cage
-    // game.world.bringToTop(cageFactory.doves);
-    // game.world.bringToTop(cageFactory.chains);
     game.world.bringToTop(cageFactory.cages);
-    // game.world.bringToTop(platforms);
-    // game.world.bringToTop(groundBlocks);
-    // game.world.bringToTop(posterFactory.getPosters());
-    // game.world.bringToTop(platforms);
 
     var hitPlatform = game.physics.arcade.collide(player.getBody(), platforms) ||
                         game.physics.arcade.collide(player.getBody(), groundBlocks);
