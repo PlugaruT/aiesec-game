@@ -29,6 +29,9 @@ preloader.preload = function () {
 
     this.game.load.audio('birdJump', 'audio/jump.wav');
     this.game.load.audio('beep', 'audio/beep.mp3');
+    this.game.load.audio('dove_flight', 'audio/dove_flight.mp3');
+    this.game.load.audio('hit_cage', 'audio/hit_cage.mp3');
+    this.game.load.audio('trampoline_jump', 'audio/trampoline_jump.mp3');
 
 };
 

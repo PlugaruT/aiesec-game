@@ -13,11 +13,14 @@ var CageFactory = require('../objects/cageFactory.js');
 var PosterFactory = require('../objects/posterFactory.js');
 var TrampolineFactory = require('../objects/trampolineFactory.js');
 var winScore = 10;
+var jumptimer = 0;
+var trampolineJumpSound;
 // var cursors;
 
 game.create = function () {
     //  We're going to be using physics, so enable the P2 Physics system
     game.physics.startSystem(Phaser.Physics.ARCADE);
+    game.physics.arcade.gravity.y = 700;
 
     //  A simple background for our game
     var sky = game.add.sprite(0, 0, 'sky');
@@ -44,6 +47,8 @@ game.create = function () {
     cageFactory = new CageFactory.CageFactory(game);
     posterFactory = new PosterFactory.PosterFactory(game);
     trampolineFactory = new TrampolineFactory.TrampolineFactory(game);
+
+    trampolineJumpSound = game.add.audio('trampoline_jump');
 
     cursors = game.input.keyboard.createCursorKeys();
 
@@ -80,9 +85,9 @@ game.update = function () {
 
     if (cursors.left.isDown) player.moveLeft();
     else if (cursors.right.isDown) player.moveRight();
-    else player.standStill();
+    else if (hitPlatform) player.standStill();
 
-    //  Allow the player to jump if they are touching the ground.
+     //Allow the player to jump if they are touching the ground.
     if (cursors.up.isDown && player.getBody().body.touching.down && hitPlatform) {
         player.jump();
     }
@@ -97,12 +102,12 @@ game.update = function () {
 
 
 function spawnCage(){
-    var chainLength = Math.floor(Math.random() * 10) + 3;
+    var chainLength = Math.floor(Math.random() * 12) + 3;
     var platformLength = 0;
     var displacement = 0;
 
     // if cage is unreachable than we need a platform
-    if(chainLength < 7){
+    if(chainLength < 9){
         platformLength = Math.floor(Math.random() * 5) + 3;
         createPlatform(game.world.width, game.world.height - 250 + chainLength*10, platformLength);
         displacement = 120;
@@ -133,7 +138,8 @@ function createGround(){
     var groundLength = parseInt(game.world.width / 64);
 
     for(var i = 0; i < groundLength + 1; i++){
-        var ground = platforms.create(i*64, game.world.height - 64, 'ground');    
+        var ground = platforms.create(i*64, game.world.height - 64, 'ground');
+        ground.body.allowGravity = false;    
         ground.body.immovable = true;
         ground.checkWorldBounds = true;
         ground.outOfBoundsKill = true;
@@ -142,11 +148,12 @@ function createGround(){
 }
 
 function addGround(){
-    var ground = platforms.create(game.world.width, game.world.height - 64, 'ground');    
-        ground.body.immovable = true;
-        groundBlocks.add(ground);
-        ground.checkWorldBounds = true;
-        ground.outOfBoundsKill = true;
+    var ground = platforms.create(game.world.width, game.world.height - 64, 'ground');
+    ground.body.allowGravity = false;    
+    ground.body.immovable = true;
+    groundBlocks.add(ground);
+    ground.checkWorldBounds = true;
+    ground.outOfBoundsKill = true;
 }
 
 
@@ -159,6 +166,7 @@ function createPlatform(x, y, len){
         else frame = 1;
 
         var block = platforms.create(x + i*50, y, 'blocks', frame);
+        block.body.allowGravity = false;
         block.body.immovable = true;
         block.body.velocity.x = -150;
 
@@ -178,9 +186,15 @@ function playerCageCollision(player, cage){
 function playerPosterCollision(player, poster){
     poster.kill();
     changeScore(-1);
+
+    // // cage fade-out effect
+    // var fadeOutPoster = this.game.add.tween(poster).to( { alpha: 0 }, 500, "Linear", true);
+
+    // fadeOutPoster.onComplete.add(function(poster){ poster.kill(); }, this);
 }
 
 function playerTrampolineCollision(player, trampoline){
+    trampolineJumpSound.play();
     game.add.tween(player).to({ y: 10 }, 700, Phaser.Easing.Quadratic.Out, true);
 }
 

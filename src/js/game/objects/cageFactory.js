@@ -10,8 +10,8 @@ class CageFactory{
 		this.doves.enableBody = true;
 		this.velocityX = -150;
 		this.alternateDistY = 40;
-		this.cageDoveMap = {};
-		this.hitCageSound = this.game.add.audio('beep');
+		this.hitCageSound = this.game.add.audio('hit_cage');
+		this.doveFlightSound = this.game.add.audio('dove_flight');
 	}
 
 
@@ -33,6 +33,7 @@ class CageFactory{
 
 	    // Enable physics on the cage
 	    this.game.physics.arcade.enable(cage);
+	    cage.body.allowGravity = false;
 
 	    // Add velocity to the cage to make it move left
 	    cage.body.velocity.x = this.velocityX;
@@ -42,7 +43,7 @@ class CageFactory{
 		let dove = this.createDove(x, cage.y + cage.height/2 - 10);
 		this.alternateOnY(dove);
 
-		this.cageDoveMap[cage] = dove;
+		// this.cageDoveMap[cage] = dove;
 
 	    this.cages.add(cage);
 	}
@@ -54,6 +55,7 @@ class CageFactory{
 	    dove.scale.setTo(0.6);
 	    dove.anchor.setTo(0.5, 0);
 	    this.game.physics.arcade.enable(dove);
+	    dove.body.allowGravity = false;
 	    dove.body.velocity.x = this.velocityX;
 
 	    dove.animations.add('rightFly', _.range(0, 6), 12, true);
@@ -73,6 +75,8 @@ class CageFactory{
 
 	    // Enable physics on the chain element
 	    this.game.physics.arcade.enable(chain);
+
+	    chain.body.allowGravity = false;
 
 	    // Add velocity to the pipe to make it move left
 	    chain.body.velocity.x = this.velocityX;
@@ -105,6 +109,7 @@ class CageFactory{
 	    dummyCage.scale.setTo(0.4);
 	    dummyCage.anchor.setTo(0.5, 0);
 	    this.game.physics.arcade.enable(dummyCage);
+	    dummyCage.body.allowGravity = false;
 	    dummyCage.body.velocity.x = this.velocityX;
 
 	    // return the dove that is inside the hitted cage
@@ -120,6 +125,7 @@ class CageFactory{
 	}
 
 	doveFly(dove){
+		this.doveFlightSound.play();
 		// translate the dove up (on Y) out of the screen where the sprite gets killed
 		this.game.add.tween(dove).to({ y: -dove.height - 10 }, 1000, "Linear", true);
 

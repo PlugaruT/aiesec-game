@@ -18,7 +18,7 @@ class TrampolineFactory{
 
 	    // Enable physics on the poster
 	    this.game.physics.arcade.enable(trampoline);
-
+	    trampoline.body.allowGravity = false;
 	    // Add velocity to the poster to make it move left
 	    trampoline.body.velocity.x = this.velocityX;
 

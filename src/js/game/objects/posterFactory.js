@@ -18,11 +18,12 @@ class PosterFactory{
 		// Create a poster at the position x and y
 	    var poster = this.game.add.sprite(this.game.world.width, 
 	    								  this.game.world.height - 64, 'posters', this.frame);
-	    poster.scale.setTo(0.6);
-	    poster.anchor.setTo(0.5, 1);
+	    poster.scale.setTo(0.5);
+	    poster.anchor.setTo(0, 1);
 
 	    // Enable physics on the poster
 	    this.game.physics.arcade.enable(poster);
+	    poster.body.allowGravity = false;
 
 	    // Add velocity to the poster to make it move left
 	    poster.body.velocity.x = this.velocityX;
