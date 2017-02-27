@@ -17,9 +17,12 @@ game.create = function () {
   // game.onPause.add()
   score = 'height: ' + game.world.height + ' width: ' + game.world.width;
 
-  bird = new FlappyBird.FlappyBird(this.game, 'bird', game.world.width / 4, game.world.height / 2);
+  bird = new FlappyBird.FlappyBird(this.game);
+  let playerHeight = bird.createBird('bird', -300, game.world.height / 2);
+  // bird.getBody().setAnchor(0.5, 0.5);
 
-  pipes = new Pipes.Pipes(game, 'longPipe', -200, bird.getBody().height);
+  let holeHeight = 2;
+  pipes = new Pipes.Pipes(game, 'longPipe', -200, playerHeight, holeHeight);
 
   // Call the 'jump' function when the spacekey is hit
   spaceKey = game.input.keyboard.addKey(

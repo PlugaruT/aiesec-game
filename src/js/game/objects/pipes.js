@@ -1,11 +1,12 @@
 class Pipes {
 
-  constructor(game, pipeSprite, pipeVelocity, playerHeight) {
+  constructor(game, pipeSprite, pipeVelocity, playerHeight, holeHeight) {
     this.game = game;
     this.pipes = this.game.add.group();
     this.pipeSprite = pipeSprite;
     this.pipeVelocity = pipeVelocity;
     this.playerHeight = playerHeight;
+    this.holeHeight = holeHeight;
   }
 
   getPipeBodies() {
@@ -30,7 +31,7 @@ class Pipes {
       pipe.y = this.game.world.height + 200;
     }
 
-    this.game.add.tween(pipe).to({y: stopAt}, 1500, Phaser.Easing.Bounce.Out, true);
+    this.game.add.tween(pipe).to({y: stopAt}, 1000, Phaser.Easing.Bounce.Out, true);
 
     // Add the pipe to our previously created group
     this.pipes.add(pipe);
@@ -49,7 +50,7 @@ class Pipes {
     let allowedMin = gameHeight / 5;
     let allowedMax = (4 * gameHeight) / 5;
     let startHole = Math.floor(Math.random() * (allowedMax - allowedMin + 1) + allowedMin);
-    let endHole = startHole + this.playerHeight * 3;
+    let endHole = startHole + this.playerHeight * this.holeHeight;
 
     this.addOnePipe(true, startHole);
     this.addOnePipe(false, endHole);
