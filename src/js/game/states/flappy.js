@@ -6,23 +6,33 @@ var PauseMenu = require('../objects/pauseMenu.js');
 var game = {};
 var score = 0;
 var scoreText;
-var spaceKey;
 var pipes;
 var bird;
 var pauseMenu;
+var debugMode = false;
 
 game.create = function () {
   //  We're going to be using physics, so enable the P2 Physics system
   game.physics.startSystem(Phaser.Physics.ARCADE);
-  // game.onPause.add()
   score = 'height: ' + game.world.height + ' width: ' + game.world.width;
 
   bird = new FlappyBird.FlappyBird(this.game);
   let playerHeight = bird.createBird('bird', -300, game.world.height / 2);
-  // bird.getBody().setAnchor(0.5, 0.5);
+  let towerNames = ['eiffel', 'new-york', 'layered', 'pisa', 'big-ben', 'two-stuff', 'very-tower', 'egg-tower', 'thin-thing', 'golden'];
+  let towersObj = {};
+  // towersObj[towerNames[0]] = {sprite: game.add.sprite(x, y, 'towers', 0)};
+  // towersObj[towerNames[1]] = {sprite: game.add.sprite(x, y, 'towers', 1)};
+  // towersObj[towerNames[2]] = {sprite: game.add.sprite(x, y, 'towers', 2)};
+  // towersObj[towerNames[3]] = {sprite: game.add.sprite(x, y, 'towers', 3)};
+  // towersObj[towerNames[4]] = {sprite: game.add.sprite(x, y, 'towers', 4)};
+  // towersObj[towerNames[5]] = {sprite: game.add.sprite(x, y, 'towers', 5)};
+  // towersObj[towerNames[6]] = {sprite: game.add.sprite(x, y, 'towers', 6)};
+  // towersObj[towerNames[7]] = {sprite: game.add.sprite(x, y, 'towers', 7)};
+  // towersObj[towerNames[8]] = {sprite: game.add.sprite(x, y, 'towers', 8)};
+  // towersObj[towerNames[9]] = {sprite: game.add.sprite(x, y, 'towers', 9)};
 
-  let holeHeight = 2;
-  pipes = new Pipes.Pipes(game, 'longPipe', -200, playerHeight, holeHeight);
+  let holeHeight = 2.5;
+  pipes = new Pipes.Pipes(game, towerNames, towersObj, -200, playerHeight, holeHeight);
 
   // Call the 'jump' function when the spacekey is hit
   spaceKey = game.input.keyboard.addKey(
@@ -44,21 +54,25 @@ game.update = function () {
   game.physics.arcade.overlap(bird.getBody(), pipes.getPipeBodies(), hitPipe, null, game);
   if (bird.checkBoundaries(0, game.world.height))
     restartGame();
+};
 
-  if (cursors.down.isPressed) {
-    game.paused = !game.paused;
+game.render = function () {
+  if (debugMode) {
+    pipes.getPipeBodies().forEach(function (pipe) {
+      game.game.debug.body(pipe);
+    });
+    game.game.debug.body(bird.getBody());
   }
-  // bird.rotateBody();
 };
 
 function onPause() {
   game.time.events.remove(this.timer);
   switchPhysics();
-};
+}
 
 function onResume() {
   switchPhysics();
-};
+}
 
 function switchPhysics() {
   game.physics.arcade.isPaused = !game.physics.arcade.isPaused;

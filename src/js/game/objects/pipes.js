@@ -1,9 +1,10 @@
 class Pipes {
 
-  constructor(game, pipeSprite, pipeVelocity, playerHeight, holeHeight) {
+  constructor(game, pipeNames, pipeSprites, pipeVelocity, playerHeight, holeHeight) {
     this.game = game;
     this.pipes = this.game.add.group();
-    this.pipeSprite = pipeSprite;
+    this.pipeNames = pipeNames;
+    this.pipeSprites = pipeSprites;
     this.pipeVelocity = pipeVelocity;
     this.playerHeight = playerHeight;
     this.holeHeight = holeHeight;
@@ -17,14 +18,16 @@ class Pipes {
     this.pipeVelocity = pipeVelocity;
   }
 
-  addOnePipe(fromTop, stopAt) {
-    let pipe = this.game.add.sprite(this.game.world.width, 0, this.pipeSprite);
+  addOnePipe(fromTop, stopAt, index) {
+
+    let pipe = this.game.add.sprite(this.game.world.width, 0, 'towers', index);
 
     pipe.anchor.setTo(0.5);
-    pipe.scale.setTo(.2);
+    // pipe.scale.setTo(.2);
 
     if (fromTop) {
       stopAt -= pipe.height / 2;
+      pipe.angle = 180;
       pipe.y = -200;
     } else {
       stopAt += pipe.height / 2;
@@ -37,6 +40,9 @@ class Pipes {
     this.pipes.add(pipe);
     // Enable physics on the pipe
     this.game.physics.arcade.enable(pipe);
+
+    let newWidth = pipe.body.width /3;
+    pipe.body.setSize(newWidth, pipe.body.height, newWidth, 0);
     // Add velocity to the pipe to make it move left
     pipe.body.velocity.x = this.pipeVelocity;
 
@@ -47,19 +53,24 @@ class Pipes {
 
   addRowOfPipes() {
     let gameHeight = this.game.world.height;
-    let allowedMin = gameHeight / 5;
-    let allowedMax = (4 * gameHeight) / 5;
+    let allowedMin = gameHeight / 3;
+    let allowedMax = (2 * gameHeight) / 3;
     let startHole = Math.floor(Math.random() * (allowedMax - allowedMin + 1) + allowedMin);
     let endHole = startHole + this.playerHeight * this.holeHeight;
 
-    this.addOnePipe(true, startHole);
-    this.addOnePipe(false, endHole);
+    let index = this.selectPipe();
+    this.addOnePipe(true, startHole, index);
+    this.addOnePipe(false, endHole, index);
   }
 
   setPipesVelocity(velocity) {
     this.pipes.forEach(function (pipe) {
       pipe.body.velocity.x = velocity;
     }, this.game);
+  }
+
+  selectPipe() {
+    return Math.floor(Math.random() * this.pipeNames.length);
   }
 
   stopPipes() {
