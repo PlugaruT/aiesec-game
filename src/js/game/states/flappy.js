@@ -12,6 +12,8 @@ var pipes;
 var bird;
 var pauseMenu;
 var debugMode = false;
+var rainOn = false;
+var fogOn = false;
 
 game.create = function () {
   this.game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -75,7 +77,7 @@ game.create = function () {
 
   bird = new FlappyBird.FlappyBird(this.game);
   let playerHeight = bird.createBird('bird', -300, game.world.height / 2);
-  let towerNames = ['eiffel', 'new-york', 'layered', 'pisa', 'big-ben', 'two-stuff', 'very-tower', 'egg-tower', 'thin-thing', 'golden'];
+  let towerNames = ['base', 'eiffel', 'new-york', 'layered', 'pisa', 'big-ben', 'two-stuff', 'very-tower', 'egg-tower', 'thin-thing', 'golden'];
   let towersObj = {};
   // towersObj[towerNames[0]] = {sprite: game.add.sprite(x, y, 'towers', 0)};
   // towersObj[towerNames[1]] = {sprite: game.add.sprite(x, y, 'towers', 1)};
@@ -99,6 +101,8 @@ game.create = function () {
   cursors = game.input.keyboard.createCursorKeys();
 
   this.timer = game.time.events.loop(3000, pipes.addRowOfPipes, pipes);
+  this.timer = game.time.events.add(15000, addRain, this);
+  this.timer = game.time.events.add(20000, addFog, this);
 
   scoreText = game.add.text(16, 16, game.score, {fontSize: '32px', fill: '#c05f44'});
 
@@ -127,6 +131,26 @@ game.render = function () {
     game.game.debug.body(bird.getBody());
   }
 };
+
+function addRain() {
+  this.weather.addRain(1);
+  this.timer = game.time.events.add(15000, removeRain, this);
+}
+
+function removeRain() {
+  this.weather.removeRain();
+  this.timer = game.time.events.add(15000, addRain, this);
+}
+
+function addFog() {
+  this.weather.addFog();
+  this.timer = game.time.events.add(15000, removeFog, this);
+}
+
+function removeFog() {
+  this.weather.removeFog();
+  this.timer = game.time.events.add(15000, addFog, this);
+}
 
 function addScore(bird, pipes) {
   let passedWall = false;

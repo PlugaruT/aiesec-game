@@ -4,7 +4,8 @@ preloader.preload = function () {
   this.game.load.image('bird', 'images/blueman_baloon.png');
 
   this.game.load.image('longPipe', 'images/rectangle.png');
-  this.game.load.spritesheet('towers', 'images/towers.png', 200, 400);
+  this.game.load.spritesheet('towers', 'images/towersA.png', 200, 400);
+  this.game.load.spritesheet('block', 'images/towers.png', 200, 400, 1);
 
   this.game.load.audio('birdJump', 'audio/jump.wav');
 
