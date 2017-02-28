@@ -28,7 +28,6 @@ preloader.preload = function () {
     this.game.load.spritesheet('posters', 'images/posters.png', 200, 200, 5);
     this.game.load.spritesheet('trampoline', 'images/trampoline-glow.png', 100, 50, 2);
     this.game.load.spritesheet('peace_progress', 'images/peace_progress.png', 400, 40);
-    // this.game.load.spritesheet('explosion', 'images/explosion.png', 283.333333, 237.5, 12);
 
     this.game.load.audio('birdJump', 'audio/jump.wav');
     this.game.load.audio('beep', 'audio/beep.mp3');
