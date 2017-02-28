@@ -9,6 +9,7 @@ var game = {};
 game.score = 0;
 var scoreText;
 var scoreUpSound;
+var musicStart = false;
 var pipes;
 var bird;
 var pauseMenu;
@@ -18,9 +19,13 @@ game.create = function () {
 
   scoreUpSound = this.game.add.audio('beep');
 
-  let music = game.add.audio('ballon-jurney');
-  music.loop = true;
-  music.play();
+  if (!musicStart) {
+    let music = game.add.audio('ballon-jurney');
+    music.loop = true;
+    music.play();
+    musicStart = true;
+  }
+
 
   this.game.physics.startSystem(Phaser.Physics.ARCADE);
   this.game.stage.backgroundColor = '#000';
@@ -212,6 +217,7 @@ function jump() {
 
 function restartGame() {
   game.score = 0;
+  // music.stop();
   game.state.start('flappy');
   // score = 0;
 }

@@ -2,8 +2,9 @@ var Stats = require('Stats')
   , properties = require('../properties')
   , boot = {};
 
-boot.preload = function() {
-    // this.game.load.image('star', 'images/star.png');
+boot.preload = function () {
+  this.game.load.image('loading', 'images/loading.png');
+  this.game.load.image('mainMenu', 'images/logo.png');
 };
 
 boot.create = function () {
@@ -14,6 +15,7 @@ boot.create = function () {
 
   this.game.sound.mute = properties.mute;
 
+  this.game.stage.backgroundColor = '#b2ddc8';
   this.game.state.start('preloader');
 };
 
@@ -30,7 +32,7 @@ function addStats(game) {
 
   // In order to correctly monitor FPS, we have to make calls to the stats package before and after phaser's update.
   var oldUpdate = game.update;
-  game.update = function() {
+  game.update = function () {
     stats.begin();
     oldUpdate.apply(game, arguments);
     stats.end();
