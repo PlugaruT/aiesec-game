@@ -6,10 +6,7 @@ preloader.preload = function () {
     // this.preloadBar.scale.setTo(3);
 
     // this.load.setPreloadSprite(this.preloadBar);
-    this.game.load.image('player', 'images/pixel-person.png');
-    this.game.load.image('sky', 'images/sky.png');
     this.game.load.image('ground', 'images/ground_block-1.png');
-    this.game.load.image('star', 'images/star.png');
     this.game.load.image('bird', 'images/bird.png');
     this.game.load.image('pipe', 'images/pipe.png');
     this.game.load.image('mainMenu', 'images/logo.png');
@@ -23,7 +20,6 @@ preloader.preload = function () {
     this.game.load.image('sun', 'images/sun.png');
     this.game.load.image('moon', 'images/moon.png');
 
-    this.game.load.spritesheet('dude', 'images/dude.png', 32, 48);
     this.game.load.spritesheet('blueMan', 'images/blueman.png', 150, 172, 48);
     this.game.load.spritesheet('buttons', 'images/buttons-1.png', 999, 1000, 9);
     this.game.load.spritesheet('chain', 'images/chain.png', 16, 26);

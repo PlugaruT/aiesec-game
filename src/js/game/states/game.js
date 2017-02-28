@@ -1,126 +1,71 @@
+var Weather = require('../objects/weather.js');
+var DayNightCycle = require('../objects/dayNightCycle.js');
 var game = {};
-var score = 0;
-var scoreText;
-var _ = require('lodash');
-
-// var platforms;
-// var cursors;
 
 game.create = function () {
-    //  We're going to be using physics, so enable the P2 Physics system
-    game.physics.startSystem(Phaser.Physics.ARCADE);
+  this.game.physics.startSystem(Phaser.Physics.ARCADE);
+  this.game.stage.backgroundColor = '#000';
+  let scaleRatio = window.devicePixelRatio / 2;
 
-    //  A simple background for our game
-    game.add.sprite(0, 0, 'sky');
+  this.weather = new Weather.Weather(this.game);
 
-    //  The platforms group contains the ground and the 2 ledges we can jump on
-    platforms = game.add.group();
+  this.dayNightCycle = new DayNightCycle.DayNightCycle(this.game, 30000);
 
-    //  We will enable physics for any object that is created in this group
-    platforms.enableBody = true;
+  let bgBitMap = this.game.add.bitmapData(this.game.width, this.game.height);
 
-    // Here we create the ground.
-    var ground = platforms.create(0, game.world.height - 64, 'ground');
+  bgBitMap.ctx.rect(0, 0, this.game.width, this.game.height);
+  bgBitMap.ctx.fillStyle = '#b2ddc8';
+  bgBitMap.ctx.fill();
 
-    //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-    ground.scale.setTo(2, 2);
+  this.backgroundSprite = this.game.add.sprite(0, 0, bgBitMap);
 
-    //  This stops it from falling away when you jump on it
-    ground.body.immovable = true;
+  this.sunSprite = this.game.add.sprite(50, -250, 'sun');
+  this.sunSprite.scale.setTo(scaleRatio);
+  this.moonSprite = this.game.add.sprite(this.game.width - (this.game.width / 4), this.game.height + 500, 'moon');
 
-    //  Now let's create two ledges
-    // var ledge = platforms.create(400, 400, 'ground');
 
-    // ledge.body.immovable = true;
+  this.mountainsBack = this.game.add.tileSprite(0,
+    this.game.height - this.game.cache.getImage('mountains-back').height,
+    this.game.width,
+    this.game.cache.getImage('mountains-back').height,
+    'mountains-back'
+  );
 
-    // ledge = platforms.create(-150, 250, 'ground');
+  this.mountainsMid1 = this.game.add.tileSprite(0,
+    this.game.height - this.game.cache.getImage('mountains-mid1').height,
+    this.game.width,
+    this.game.cache.getImage('mountains-mid1').height,
+    'mountains-mid1'
+  );
 
-    // ledge.body.immovable = true;
+  this.mountainsMid2 = this.game.add.tileSprite(0,
+    this.game.height - this.game.cache.getImage('mountains-mid2').height,
+    this.game.width,
+    this.game.cache.getImage('mountains-mid2').height,
+    'mountains-mid2'
+  );
 
-    player = game.add.sprite(100, game.world.height / 2, 'blueMan');
-    // player.alpha = 1000;
+  this.weather.addRain(1);
+  this.weather.addFog();
 
-    game.physics.arcade.enable(player);
+  let backgroundSprites = [
+    {sprite: this.backgroundSprite, from: 0x1f2a27, to: 0xB2DDC8},
+    {sprite: this.mountainsBack, from: 0x2f403b, to: 0x96CCBB},
+    {sprite: this.mountainsMid1, from: 0x283632, to: 0x8BBCAC},
+    {sprite: this.mountainsMid2, from: 0x202b28, to: 0x82AD9D}
+  ];
 
-    player.facingRight = true;
+  this.dayNightCycle.initShading(backgroundSprites);
+  this.dayNightCycle.initSun(this.sunSprite);
+  this.dayNightCycle.initMoon(this.moonSprite);
 
-    player.body.bounce.y = 0.2;
-    player.body.gravity.y = 300;
-    player.body.collideWorldBounds = true;
-
-    //  Our two animations, walking left and right.
-    // player.animations.add('idle', [0], 12, false);
-    player.animations.add('jumpRight', _.range(7, 13), 15, false);
-    player.animations.add('jumpLeft', _.range(31, 13), 10, false);
-    player.animations.add('rightRun', _.range(14, 24), 24, true);
-    player.animations.add('leftRun', _.range(38, 48), 24, true);
-
-    cursors = game.input.keyboard.createCursorKeys();
-
-    stars = game.add.group();
-    stars.enableBody = true;
-
-    for (var i = 0; i < 12; i++) {
-        var star = stars.create(i * 70, 0, 'star');
-        star.body.gravity.y = 6;
-
-        star.body.bounce.y = 0.7 + Math.random() * 0.2;
-    }
-    scoreText = game.add.text(16, 16, 'score: 0', {fontSize: '32px', fill: '#000'});
 };
-
 
 game.update = function () {
-    var hitPlatform = game.physics.arcade.collide(player, platforms);
-    game.physics.arcade.collide(stars, platforms);
-    game.physics.arcade.overlap(player, stars, collectStar, null, this);
-
-    this.game.debug.text(hitPlatform);
-    //  Reset the players velocity (movement)
-    player.body.velocity.x = 0;
-
-    if (cursors.left.isDown) {
-        //  Move to the left
-        player.body.velocity.x = -320;
-        // player.animations.play('leftRun');
-        player.facingRight = false;
-    }
-    else if (cursors.right.isDown) {
-        //      Move to the right
-        player.body.velocity.x = 320;
-        // player.animations.play('rightRun');
-        player.facingRight = true;
-
-    }
-    else {
-        //  Stand still
-        if (player.facingRight)
-            player.animations.play('rightRun');
-        else
-            player.animations.play('leftRun');
-    }
-
-    //  Allow the player to jump if they are touching the ground.
-    if (cursors.up.isDown && player.body.touching.down && hitPlatform) {
-        player.body.velocity.y = -350;
-
-        //define direction of jump
-        if (player.facingRight)
-            player.animations.play('jumpRight');
-        else
-            player.animations.play('jumpLeft');
-
-    }
+  this.mountainsBack.tilePosition.x -= 0.1;
+  this.mountainsMid1.tilePosition.x -= 0.3;
+  this.mountainsMid2.tilePosition.x -= 0.75;
 };
 
-function collectStar(player, star) {
-
-    // Removes the star from the screen
-    star.kill();
-    //  Add and update the score
-    score += 10;
-    scoreText.text = 'Score: ' + score;
-
-}
 
 module.exports = game;
