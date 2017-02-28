@@ -12,7 +12,6 @@ preloader.preload = function () {
     this.game.load.image('mainMenu', 'images/logo.png');
     this.game.load.image('cage', 'images/cage.png');
     this.game.load.image('dove', 'images/dove.png');
-    this.game.load.image('poster', 'images/poster.png');
     this.game.load.image('mountains-backk', 'images/3.png');
     this.game.load.image('mountains-back', 'images/2.png');
     this.game.load.image('mountains-mid1', 'images/1.png');
