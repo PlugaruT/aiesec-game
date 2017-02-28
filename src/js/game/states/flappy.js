@@ -1,120 +1,225 @@
-var game = {};
-var score = 0;
-var scoreText;
 var _ = require('lodash');
-var spaceKey;
+var FlappyBird = require('../objects/bird.js');
+var Pipes = require('../objects/pipes.js');
+var PauseMenu = require('../objects/pauseMenu.js');
+var Weather = require('../objects/weather.js');
+var DayNightCycle = require('../objects/dayNightCycle.js');
+
+var game = {};
+game.score = 0;
+var scoreText;
+var scoreUpSound;
+var musicStart = false;
 var pipes;
 var bird;
-var jumpSound;
-
-// var platforms;
-// var cursors;
+var pauseMenu;
+var debugMode = false;
 
 game.create = function () {
-    //  We're going to be using physics, so enable the P2 Physics system
-    game.physics.startSystem(Phaser.Physics.ARCADE);
 
-    //  A simple background for our game
-    game.add.sprite(0, 0, 'sky');
-    jumpSound = game.add.audio('beep');
+  scoreUpSound = this.game.add.audio('beep');
 
-    // Display the bird at the position x=100 and y=245
-    bird = game.add.sprite(100, 245, 'bird');
-    bird.anchor.setTo(-0.2, 0.5);
+  if (!musicStart) {
+    let music = game.add.audio('ballon-jurney');
+    music.loop = true;
+    music.play();
+    musicStart = true;
+  }
 
-    // Add physics to the bird
-    // Needed for: movements, gravity, collisions, etc.
-    game.physics.arcade.enable(bird);
 
-    // Add gravity to the bird to make it fall
-    bird.body.gravity.y = 1000;
+  this.game.physics.startSystem(Phaser.Physics.ARCADE);
+  this.game.stage.backgroundColor = '#000';
+  let scaleRatio = window.devicePixelRatio / 2;
 
-    pipes = game.add.group();
+  this.weather = new Weather.Weather(this.game);
 
-    // Call the 'jump' function when the spacekey is hit
-    spaceKey = game.input.keyboard.addKey(
-        Phaser.Keyboard.SPACEBAR);
-    spaceKey.onDown.add(jump, game);
+  this.dayNightCycle = new DayNightCycle.DayNightCycle(this.game, 30000);
 
-    cursors = game.input.keyboard.createCursorKeys();
+  let bgBitMap = this.game.add.bitmapData(this.game.width, this.game.height);
 
-    this.timer = game.time.events.loop(1500, addRowOfPipes, game);
+  bgBitMap.ctx.rect(0, 0, this.game.width, this.game.height);
+  bgBitMap.ctx.fillStyle = '#b2ddc8';
+  bgBitMap.ctx.fill();
 
-    scoreText = game.add.text(16, 16, 'score: 0', {fontSize: '32px', fill: '#000'});
+  this.backgroundSprite = this.game.add.sprite(0, 0, bgBitMap);
+
+  this.sunSprite = this.game.add.sprite(50, -250, 'sun');
+  this.sunSprite.scale.setTo(scaleRatio);
+  this.moonSprite = this.game.add.sprite(this.game.width - (this.game.width / 4), this.game.height + 500, 'moon');
+
+
+  this.mountainsBack = this.game.add.tileSprite(0,
+    this.game.height - this.game.cache.getImage('mountains-back').height,
+    this.game.width,
+    this.game.cache.getImage('mountains-back').height,
+    'mountains-back'
+  );
+
+  this.mountainsMid1 = this.game.add.tileSprite(0,
+    this.game.height - this.game.cache.getImage('mountains-mid1').height,
+    this.game.width,
+    this.game.cache.getImage('mountains-mid1').height,
+    'mountains-mid1'
+  );
+
+  this.mountainsMid2 = this.game.add.tileSprite(0,
+    this.game.height - this.game.cache.getImage('mountains-mid2').height,
+    this.game.width,
+    this.game.cache.getImage('mountains-mid2').height,
+    'mountains-mid2'
+  );
+
+  // this.weather.addRain(1);
+  // this.weather.addFog();
+
+  let backgroundSprites = [
+    {sprite: this.backgroundSprite, from: 0x1f2a27, to: 0xB2DDC8},
+    {sprite: this.mountainsBack, from: 0x2f403b, to: 0x96CCBB},
+    {sprite: this.mountainsMid1, from: 0x283632, to: 0x8BBCAC},
+    {sprite: this.mountainsMid2, from: 0x202b28, to: 0x82AD9D}
+  ];
+
+  this.dayNightCycle.initShading(backgroundSprites);
+  this.dayNightCycle.initSun(this.sunSprite);
+  this.dayNightCycle.initMoon(this.moonSprite);
+  //  We're going to be using physics, so enable the P2 Physics system
+  game.physics.startSystem(Phaser.Physics.ARCADE);
+  score = 'height: ' + game.world.height + ' width: ' + game.world.width;
+
+  bird = new FlappyBird.FlappyBird(this.game);
+  let playerHeight = bird.createBird('bird', -300, game.world.height / 2);
+  let towerNames = ['base', 'eiffel', 'new-york', 'layered', 'pisa', 'big-ben', 'two-stuff', 'very-tower', 'egg-tower', 'thin-thing', 'golden'];
+  let towersObj = {};
+  // towersObj[towerNames[0]] = {sprite: game.add.sprite(x, y, 'towers', 0)};
+  // towersObj[towerNames[1]] = {sprite: game.add.sprite(x, y, 'towers', 1)};
+  // towersObj[towerNames[2]] = {sprite: game.add.sprite(x, y, 'towers', 2)};
+  // towersObj[towerNames[3]] = {sprite: game.add.sprite(x, y, 'towers', 3)};
+  // towersObj[towerNames[4]] = {sprite: game.add.sprite(x, y, 'towers', 4)};
+  // towersObj[towerNames[5]] = {sprite: game.add.sprite(x, y, 'towers', 5)};
+  // towersObj[towerNames[6]] = {sprite: game.add.sprite(x, y, 'towers', 6)};
+  // towersObj[towerNames[7]] = {sprite: game.add.sprite(x, y, 'towers', 7)};
+  // towersObj[towerNames[8]] = {sprite: game.add.sprite(x, y, 'towers', 8)};
+  // towersObj[towerNames[9]] = {sprite: game.add.sprite(x, y, 'towers', 9)};
+
+  let holeHeight = 2.5;
+  pipes = new Pipes.Pipes(game, towerNames, towersObj, -200, playerHeight, holeHeight);
+
+  // Call the 'jump' function when the spacekey is hit
+  spaceKey = game.input.keyboard.addKey(
+    Phaser.Keyboard.SPACEBAR);
+  spaceKey.onDown.add(jump, game);
+
+  cursors = game.input.keyboard.createCursorKeys();
+
+  this.timer = game.time.events.loop(3000, pipes.addRowOfPipes, pipes);
+  this.timer = game.time.events.add(15000, addRain, this);
+  this.timer = game.time.events.add(20000, addFog, this);
+
+  scoreText = game.add.text(16, 16, game.score, {fontSize: '32px', fill: '#c05f44'});
+
+  pauseMenu = new PauseMenu.PauseMenu(game);
+
 };
 
 
 game.update = function () {
-    game.physics.arcade.overlap(bird, pipes, hitPipe, null, game);
-    if (bird.y < 0 || bird.y > game.world.height)
-        restartGame();
+  game.physics.arcade.overlap(bird.getBody(), pipes.getPipeBodies(), hitPipe, null, game);
+  if (bird.checkBoundaries(0, game.world.height))
+    restartGame();
+  else if (addScore(bird.getBody(), pipes.getPipeBodies())) {
+    game.score += 1;
+    scoreUpSound.play();
+    scoreText.setText(game.score);
+  }
 
-    if (bird.angle < 20)
-        bird.angle += 1;
+  updateMoutains(this);
 };
 
-function addOnePipe(x, y) {
-    // Create a pipe at the position x and y
-    var pipe = game.add.sprite(x, y, 'pipe');
+game.render = function () {
+  if (debugMode) {
+    pipes.getPipeBodies().forEach(function (pipe) {
+      game.game.debug.body(pipe);
+    });
+    game.game.debug.body(bird.getBody());
+  }
+};
 
-    // Add the pipe to our previously created group
-    pipes.add(pipe);
-
-    // Enable physics on the pipe
-    game.physics.arcade.enable(pipe);
-
-    // Add velocity to the pipe to make it move left
-    pipe.body.velocity.x = -200;
-
-    // Automatically kill the pipe when it's no longer visible
-    pipe.checkWorldBounds = true;
-    pipe.outOfBoundsKill = true;
+function addRain() {
+  this.weather.addRain(1);
+  this.timer = game.time.events.add(15000, removeRain, this);
 }
 
-function addRowOfPipes() {
-    // Randomly pick a number between 1 and 5
-    // This will be the hole position
-    score++;
-    scoreText.text = "Score: " + score;
-    var hole = Math.floor(Math.random() * 7) + 1;
-
-    // Add the 6 pipes
-    // With one big hole at position 'hole' and 'hole + 1'
-    for (var i = 0; i < 10; i++)
-        if (i != hole && i != hole + 1)
-            addOnePipe(game.world.width, i * 60 + 10);
+function removeRain() {
+  this.weather.removeRain();
+  this.timer = game.time.events.add(15000, addRain, this);
 }
+
+function addFog() {
+  this.weather.addFog();
+  this.timer = game.time.events.add(15000, removeFog, this);
+}
+
+function removeFog() {
+  this.weather.removeFog();
+  this.timer = game.time.events.add(15000, addFog, this);
+}
+
+function addScore(bird, pipes) {
+  let passedWall = false;
+  pipes.forEachAlive(function (pipe) {
+    if (!pipe.scored && pipe.x <= bird.x) {
+      passedWall = true;
+      pipe.scored = true;
+    }
+  });
+  return passedWall;
+}
+
+function onPause() {
+  game.time.events.remove(this.timer);
+  switchPhysics();
+}
+
+function onResume() {
+  switchPhysics();
+}
+
+function switchPhysics() {
+  game.physics.arcade.isPaused = !game.physics.arcade.isPaused;
+}
+
+function updateMoutains(game) {
+  game.mountainsBack.tilePosition.x -= 0.1;
+  game.mountainsMid1.tilePosition.x -= 0.3;
+  game.mountainsMid2.tilePosition.x -= 0.75;
+}
+
 
 function hitPipe() {
-    // If the bird has already hit a pipe, do nothing
-    // It means the bird is already falling off the screen
-    if (bird.alive == false)
-        return;
+  // If the bird has already hit a pipe, do nothing
+  // It means the bird is already falling off the screen
+  if (!bird.isAlive())
+    return;
 
-    // Set the alive property of the bird to false
-    bird.alive = false;
+  // Set the alive property of the bird to false
+  bird.killBird();
 
-    // Prevent new pipes from appearing
-    game.time.events.remove(this.timer);
+  // Prevent new pipes from appearing
+  game.time.events.remove(this.timer);
 
-    // Go through all the pipes, and stop their movement
-    pipes.forEach(function (pipe) {
-        pipe.body.velocity.x = 0;
-    }, game);
+  // Go through all the pipes, and stop their movement
+  pipes.stopPipes();
 }
 
 function jump() {
-    if (bird.alive == false)
-        return;
-    jumpSound.play();
-    bird.body.velocity.y = -350;
-    // Create an animation on the bird
-    game.add.tween(bird).to({angle: -20}, 100).start();
+  bird.jump();
 }
 
 function restartGame() {
-    game.state.start('flappy');
-    score = 0;
+  game.score = 0;
+  // music.stop();
+  game.state.start('flappy');
+  // score = 0;
 }
 
 

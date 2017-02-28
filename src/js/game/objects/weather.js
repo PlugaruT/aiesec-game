@@ -51,7 +51,7 @@ class Weather {
   }
 
   removeRain() {
-    this.emitter.kill();
+    this.emitter.destroy(true);
   }
 }
 

@@ -26,6 +26,7 @@ game.create = function () {
   game.physics.startSystem(Phaser.Physics.ARCADE);
   game.physics.arcade.gravity.y = 700;
 
+
   var music = game.add.audio('music');
   music.loop = true;
   music.play();
