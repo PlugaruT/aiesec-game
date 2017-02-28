@@ -8,14 +8,20 @@ var DayNightCycle = require('../objects/dayNightCycle.js');
 var game = {};
 game.score = 0;
 var scoreText;
+var scoreUpSound;
 var pipes;
 var bird;
 var pauseMenu;
 var debugMode = false;
-var rainOn = false;
-var fogOn = false;
 
 game.create = function () {
+
+  scoreUpSound = this.game.add.audio('beep');
+
+  let music = game.add.audio('ballon-jurney');
+  music.loop = true;
+  music.play();
+
   this.game.physics.startSystem(Phaser.Physics.ARCADE);
   this.game.stage.backgroundColor = '#000';
   let scaleRatio = window.devicePixelRatio / 2;
@@ -117,6 +123,7 @@ game.update = function () {
     restartGame();
   else if (addScore(bird.getBody(), pipes.getPipeBodies())) {
     game.score += 1;
+    scoreUpSound.play();
     scoreText.setText(game.score);
   }
 

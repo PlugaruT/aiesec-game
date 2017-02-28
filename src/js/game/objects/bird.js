@@ -6,7 +6,7 @@ class FlappyBird {
 
   createBird(spriteName, positionX, positionY) {
     this.bird = this.game.add.sprite(positionX, positionY, spriteName);
-    this.jumpSound = this.game.add.audio('beep');
+    this.jumpSound = this.game.add.audio('flame-short', 0.3);
     this.bird.anchor.setTo(0.5, 0.5);
     this.game.physics.arcade.enable(this.bird);
 
